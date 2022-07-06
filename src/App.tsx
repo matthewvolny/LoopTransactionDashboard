@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import "./App.css";
-import { SuccessfulPayments, FormattedSuccessfulPayments } from "./models";
+import { SuccessfulPayments } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { Table } from "./components/Table";
 
 function App() {
-  const [successfulPayments, setSuccessfulPayments] = useState<
-    FormattedSuccessfulPayments[]
-  >([]);
+  const [successfulPayments, setSuccessfulPayments] =
+    useState<SuccessfulPayments>();
+  // const [transactions, setTransactions] = useState<Transactions>();
 
   //1
   useEffect(() => {
     fetchSubscriptionInfo();
   }, []);
+
+  const headings = [
+    { label: `transaction`, sortable: true },
+    { label: `contractAddress`, sortable: true },
+    { label: `processor`, sortable: true },
+    { label: `accountProcessed`, sortable: true },
+    { label: `processedForDate`, sortable: true },
+    { label: `feeAmount`, sortable: true },
+    { label: `netAmount`, sortable: true },
+    { label: `paymentToken`, sortable: true },
+  ];
 
   //2
   const fetchSubscriptionInfo = () => {
@@ -48,12 +59,15 @@ function App() {
         console.log(data.data.successfulPayments);
         let successfulPayments = data.data.successfulPayments;
         let formattedSuccessfulPayments = successfulPayments.map(
-          (transaction: SuccessfulPayments) => {
-            return formatSuccessfulPaymentsData(transaction);
+          (transaction: any) => {
+            return formatSuccessfulPaymentsDataForTable(transaction);
           }
         );
-        console.log(formattedSuccessfulPayments);
-        setSuccessfulPayments(formattedSuccessfulPayments);
+
+        setSuccessfulPayments({
+          headings: headings,
+          records: formattedSuccessfulPayments,
+        });
       })
       .catch((err) => {
         console.log("Error fetching data: ", err);
@@ -61,38 +75,72 @@ function App() {
   };
 
   //3
-  const formatSuccessfulPaymentsData = (transaction: SuccessfulPayments) => {
-    // format 'processedForDate'
+  const formatSuccessfulPaymentsDataForTable = (transaction: any) => {
+    //formats 'processedForDate' value
     let formattedProcessedForDate = formatDateTimeFromSeconds(
       Number(transaction.processedForDate)
     );
 
     return {
-      accountProcessed: {
-        label: "accountProcessed",
-        value: transaction.accountProcessed,
-      },
-      contractAddress: {
-        label: "contractAddress",
-        value: transaction.contractAddress,
-      },
-      feeAmount: { label: "feeAmount", value: transaction.feeAmount },
-      netAmount: { label: "netAmount", value: transaction.netAmount },
-      paymentToken: { label: "paymentToken", value: transaction.paymentToken },
-      processedForDate: {
-        label: "processedForDate",
-        value: formattedProcessedForDate,
-      },
-      processor: { label: "processor", value: transaction.processor },
-      transaction: { label: "transaction", value: transaction.transaction },
+      id: Math.floor(Math.random() * 1000000000),
+      values: [
+        {
+          label: `transaction`,
+          value: transaction.transaction,
+        },
+        {
+          label: `contractAddress`,
+          value: transaction.contractAddress,
+        },
+        {
+          label: `processor`,
+          value: transaction.processor,
+        },
+        {
+          label: `accountProcessed`,
+          value: transaction.accountProcessed,
+        },
+        {
+          label: `processedForDate`,
+          value: formattedProcessedForDate,
+        },
+        {
+          label: `feeAmount`,
+          value: transaction.feeAmount,
+        },
+        {
+          label: `netAmount`,
+          value: transaction.netAmount,
+        },
+        {
+          label: `paymentToken`,
+          value: transaction.paymentToken,
+        },
+      ],
     };
   };
+
+  // const headings = [
+  //   { label: `transaction`, sortable: true },
+  //   { label: `contractAddress`, sortable: true },
+  //   { label: `processor`, sortable: true },
+  //   { label: `accountProcessed`, sortable: true },
+  //   { label: `processedForDate`, sortable: true },
+  //   { label: `feeAmount`, sortable: true },
+  //   { label: `netAmount`, sortable: true },
+  //   { label: `paymentToken`, sortable: true },
+  // ];
+
+  // useEffect(() => {
+  //   console.log({ headings: headings, records: successfulPayments });
+  //   setTransactions({ headings: headings, records: successfulPayments });
+  // }, [successfulPayments]);
 
   return (
     <div>
       <div>Transaction Data</div>
       <div>Polygon Network</div>
-      <Table data={successfulPayments} />
+      <Table data={successfulPayments} />;
     </div>
   );
 }
