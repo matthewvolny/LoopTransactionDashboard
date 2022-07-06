@@ -5,6 +5,7 @@ import { SuccessfulPayments } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { Table } from "./components/Table";
 import { Dropdown } from "./components/Dropdown";
+import { PaymentTypeSelector } from "./components/PaymentTypeSelector";
 
 function App() {
   const [successfulPayments, setSuccessfulPayments] =
@@ -15,7 +16,7 @@ function App() {
 
   //1
   useEffect(() => {
-    fetchSubscriptionInfo(processor);
+    fetchPaymentInfo(processor);
   }, [processor]);
 
   const headings = [
@@ -30,7 +31,7 @@ function App() {
   ];
 
   //2
-  const fetchSubscriptionInfo = (processor: string) => {
+  const fetchPaymentInfo = (processor: string) => {
     const APIURL =
       "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon";
 
@@ -126,6 +127,8 @@ function App() {
   return (
     <div>
       <div>
+        <div>What would you like to query?</div>
+        <PaymentTypeSelector fetchPaymentInfo={fetchPaymentInfo} />
         <span>Choose processor</span>
         <Dropdown setProcessor={setProcessor} />
         <span>from</span>
