@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { SuccessfulPayments } from "../models";
+import { Payments } from "../models";
 
 interface TableProps {
-  data: SuccessfulPayments | undefined;
+  data: Payments | undefined;
 }
 
 export const Table = ({ data }: TableProps) => {

@@ -13,7 +13,7 @@ export interface IdAndValues {
   values: LabelAndValue[];
 }
 
-export interface SuccessfulPayments {
+export interface Payments {
   headings: Heading[];
   records: IdAndValues[];
 }
