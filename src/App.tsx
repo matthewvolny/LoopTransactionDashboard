@@ -4,16 +4,19 @@ import "./App.css";
 import { SuccessfulPayments } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { Table } from "./components/Table";
+import { Dropdown } from "./components/Dropdown";
 
 function App() {
   const [successfulPayments, setSuccessfulPayments] =
     useState<SuccessfulPayments>();
-  // const [transactions, setTransactions] = useState<Transactions>();
+  const [processor, setProcessor] = useState<string>(
+    "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e"
+  );
 
   //1
   useEffect(() => {
-    fetchSubscriptionInfo();
-  }, []);
+    fetchSubscriptionInfo(processor);
+  }, [processor]);
 
   const headings = [
     { label: `transaction`, sortable: true },
@@ -27,13 +30,13 @@ function App() {
   ];
 
   //2
-  const fetchSubscriptionInfo = () => {
+  const fetchSubscriptionInfo = (processor: string) => {
     const APIURL =
       "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon";
 
     const tokensQuery = `
   query {
-    successfulPayments (where: { processor: "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e" }) {
+    successfulPayments (where: { processor: "${processor}" }) {
     transaction
     contractAddress
     processor
@@ -120,27 +123,19 @@ function App() {
     };
   };
 
-  // const headings = [
-  //   { label: `transaction`, sortable: true },
-  //   { label: `contractAddress`, sortable: true },
-  //   { label: `processor`, sortable: true },
-  //   { label: `accountProcessed`, sortable: true },
-  //   { label: `processedForDate`, sortable: true },
-  //   { label: `feeAmount`, sortable: true },
-  //   { label: `netAmount`, sortable: true },
-  //   { label: `paymentToken`, sortable: true },
-  // ];
-
-  // useEffect(() => {
-  //   console.log({ headings: headings, records: successfulPayments });
-  //   setTransactions({ headings: headings, records: successfulPayments });
-  // }, [successfulPayments]);
-
   return (
     <div>
-      <div>Transaction Data</div>
-      <div>Polygon Network</div>
-      <Table data={successfulPayments} />;
+      <div>
+        <span>Choose processor</span>
+        <Dropdown setProcessor={setProcessor} />
+        <span>from</span>
+        <span>Network (Polygon)</span>
+      </div>
+      {processor ? (
+        <Table data={successfulPayments} />
+      ) : (
+        <div>Enter processor and network</div>
+      )}
     </div>
   );
 }
