@@ -17,3 +17,8 @@ export interface Payments {
   headings: Heading[];
   records: IdAndValues[];
 }
+
+export type NetworkInfo = {
+  name: string;
+  url: string;
+};

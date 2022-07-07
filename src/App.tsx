@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
-import { Payments } from "./models";
+import { Payments, NetworkInfo } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { Table } from "./components/Table";
-import { Dropdown } from "./components/Dropdown";
+import { DropdownProcessors } from "./components/DropdownProcessors";
+import { DropdownNetworks } from "./components/DropdownNetworks";
 import { PaymentTypeSelector } from "./components/PaymentTypeSelector";
 import "./App.css";
 
@@ -20,7 +21,7 @@ function App() {
   //1
   useEffect(() => {
     fetchPaymentInfo(processor, network);
-  }, [processor]);
+  }, [processor, network]);
 
   const headings = {
     successfulPaymentHeadings: [
@@ -182,16 +183,28 @@ function App() {
     };
   };
 
+  const processors: string[] = [
+    "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e",
+    "0x0000000000000000000000000000000000000000",
+  ];
+
+  const networkURLs: NetworkInfo[] = [
+    {
+      name: "Polygon",
+      url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon",
+    },
+    {
+      name: "Rinkeby",
+      url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-rinkeby",
+    },
+  ];
+
   return (
     <div>
-      <div>
-        <div>What would you like to query?</div>
-        {/* <PaymentTypeSelector fetchPaymentInfo={fetchPaymentInfo} /> */}
-        <span>Choose processor</span>
-        <Dropdown setProcessor={setProcessor} />
-        <span>from</span>
-        <span>Network (Polygon)</span>
-      </div>
+      <div>Select bot</div>
+      <DropdownProcessors processors={processors} setProcessor={setProcessor} />
+      <div>Select Network</div>
+      <DropdownNetworks networkURLs={networkURLs} setNetwork={setNetwork} />
       {processor ? (
         <Table data={successfulPayments} />
       ) : (
