@@ -205,11 +205,10 @@ function App() {
       <DropdownProcessors processors={processors} setProcessor={setProcessor} />
       <div>Select Network</div>
       <DropdownNetworks networkURLs={networkURLs} setNetwork={setNetwork} />
-      {processor ? (
-        <Table data={successfulPayments} />
-      ) : (
-        <div>Enter processor and network</div>
-      )}
+      <div>Successful Payments</div>
+      <Table data={successfulPayments} />
+      <div>Failed Payments</div>
+      <Table data={failedPayments} />
     </div>
   );
 }

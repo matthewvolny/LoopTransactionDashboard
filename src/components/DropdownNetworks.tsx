@@ -12,7 +12,7 @@ export const DropdownNetworks = ({
   setNetwork,
 }: DropdownProps) => {
   const [selectedOption, setSelectedOption] = useState<string>(
-    "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-rinkeby"
+    "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon"
   );
 
   const handleChange = (e: string) => {
