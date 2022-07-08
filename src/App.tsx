@@ -3,6 +3,7 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { Payments, NetworkInfo } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { Table } from "./components/Table";
+import { AccordionTable } from "./components/AccordionTable";
 import { DropdownProcessors } from "./components/DropdownProcessors";
 import { DropdownNetworks } from "./components/DropdownNetworks";
 import { PaymentTypeSelector } from "./components/PaymentTypeSelector";
@@ -211,7 +212,9 @@ function App() {
         // console.log(addSubscriptionDataToPayments(data.data));
         let detailedPaymentData = addSubscriptionDataToPayments(data.data);
         console.log(detailedPaymentData);
-        formatPaymentsForTable(detailedPaymentData);
+
+        console.log(formatPaymentsForTable(detailedPaymentData));
+        setPayments(formatPaymentsForTable(detailedPaymentData));
         //successful and failed payments
         // let successfulPayments = data.data.successfulPayments;
         // let failedPayments = data.data.failedPayments;
@@ -305,9 +308,15 @@ function App() {
         batchCount[batchId] = 1;
         //can modify to push { label: "x", value: "y" }
         batches.push({
-          transaction: batchId,
-          processedForDate: payment.processedForDate,
-          contractAddress: payment.contractAddress,
+          transaction: { label: batchId, value: batchId },
+          processedForDate: {
+            label: payment.processedForDate,
+            value: payment.processedForDate,
+          },
+          contractAddress: {
+            label: payment.contractAddress,
+            value: payment.contractAddress,
+          },
         });
       }
     });
@@ -319,21 +328,156 @@ function App() {
     //!successful transactions
     let batchArray = batches.map((batch: any) => {
       const foundSuccessfulTransactions = data.successfulPayments.filter(
-        ({ transaction }: any) => batch.transaction === transaction
+        ({ transaction }: any) => batch.transaction.label === transaction
       );
       console.log(foundSuccessfulTransactions);
 
+      const formattedFoundSuccessfulTransactions =
+        foundSuccessfulTransactions.map(
+          ({
+            accountProcessed,
+            endDate,
+            feeAmount,
+            frequency,
+            lastPaymentDate,
+            netAmount,
+            paymentToken,
+            processor,
+            startDate,
+            subscriptionAmount,
+            transaction,
+          }: any) => {
+            return {
+              accountProcessed: {
+                label: accountProcessed,
+                value: accountProcessed,
+              },
+              endDate: {
+                label: endDate,
+                value: endDate,
+              },
+              feeAmount: {
+                label: feeAmount,
+                value: feeAmount,
+              },
+              frequency: {
+                label: frequency,
+                value: frequency,
+              },
+              lastPaymentDate: {
+                label: lastPaymentDate,
+                value: lastPaymentDate,
+              },
+              netAmount: {
+                label: netAmount,
+                value: netAmount,
+              },
+              paymentToken: {
+                label: paymentToken,
+                value: paymentToken,
+              },
+              processor: {
+                label: processor,
+                value: processor,
+              },
+              startDate: {
+                label: startDate,
+                value: startDate,
+              },
+              subscriptionAmount: {
+                label: subscriptionAmount,
+                value: subscriptionAmount,
+              },
+              transaction: {
+                label: transaction,
+                value: transaction,
+              },
+            };
+          }
+        );
+      console.log(formattedFoundSuccessfulTransactions);
+
       const foundFailedTransactions = data.failedPayments.filter(
-        ({ transaction }: any) => batch.transaction === transaction
+        ({ transaction }: any) => batch.transaction.label === transaction
       );
       console.log(foundFailedTransactions);
+
+      const formattedFoundFailedTransactions = foundFailedTransactions.map(
+        ({
+          accountProcessed,
+          endDate,
+          feeAmount,
+          frequency,
+          lastPaymentDate,
+          netAmount,
+          token, //!called 'paymentToken' in 'successfulPayment'
+          processor,
+          startDate,
+          subscriptionAmount,
+          reason,
+          transaction,
+        }: any) => {
+          return {
+            accountProcessed: {
+              label: accountProcessed,
+              value: accountProcessed,
+            },
+            endDate: {
+              label: endDate,
+              value: endDate,
+            },
+            feeAmount: {
+              label: feeAmount,
+              value: feeAmount,
+            },
+            frequency: {
+              label: frequency,
+              value: frequency,
+            },
+            lastPaymentDate: {
+              label: lastPaymentDate,
+              value: lastPaymentDate,
+            },
+            netAmount: {
+              label: netAmount,
+              value: netAmount,
+            },
+            token: {
+              label: token,
+              value: token,
+            }, //!called 'paymentToken' in 'successfulPayment'
+            processor: {
+              label: processor,
+              value: processor,
+            },
+            startDate: {
+              label: startDate,
+              value: startDate,
+            },
+            subscriptionAmount: {
+              label: subscriptionAmount,
+              value: subscriptionAmount,
+            },
+            reason: {
+              label: reason,
+              value: reason,
+            },
+            transaction: {
+              label: transaction,
+              value: transaction,
+            },
+          };
+        }
+      );
+
+      console.log(formattedFoundFailedTransactions);
 
       return foundSuccessfulTransactions || foundFailedTransactions
         ? {
             ...batch,
             payments: {
-              successfulPayments: foundSuccessfulTransactions,
-              failedPayments: foundFailedTransactions,
+              successfulPayments: formattedFoundSuccessfulTransactions,
+              failedPayments: formattedFoundFailedTransactions,
             },
           }
         : batch;
@@ -343,27 +487,49 @@ function App() {
     //add headings
     const dataFormattedForTable = {
       headings: {
-        batchHeadings: {
-          id: { label: "x", sortable: "y" },
-          date: { label: "x", sortable: "y" },
-          recipient: { label: "x", sortable: "y" },
-        },
+        batchHeadings: [
+          { name: "contractAddress", label: "Recipient", sortable: "y" },
+          { name: "processedForDate", label: "Date", sortable: "y" },
+          { name: "transaction", label: "Id", sortable: "y" },
+        ],
         successfulPaymentsHeadings: {
-          subscriber: { label: "x", value: "y" },
-          amountTransferred: { label: "x", value: "y" },
-          fee: { label: "x", value: "y" },
-          tokenId: { label: "x", value: "y" },
+          accountProcessed: { label: "Subscriber Wallet", sortable: "y" },
+          endDate: { label: "End Date", sortable: "y" },
+          feeAmount: { label: "Fee", sortable: "y" },
+          frequency: { label: "Frequency", sortable: "y" },
+          lastPaymentDate: { label: "Last Payment Date", sortable: "y" },
+          netAmount: { label: "Net Amount", sortable: "y" },
+          paymentToken: { label: "paymentToken ", sortable: "y" },
+          processor: { label: "Processor", sortable: "y" },
+          startDate: { label: "Start Date", sortable: "y" },
+          subscriptionAmount: { label: "Subscription Amount", sortable: "y" },
+          transaction: {
+            label: "Transaction (matches batch Id)",
+            sortable: "y",
+          }, //'transaction' not strictly needed here
         },
         failedPaymentsHeadings: {
-          subscriber: { label: "x", value: "y" },
-          amountTransferred: { label: "x", value: "y" },
-          fee: { label: "x", value: "y" },
-          tokenId: { label: "x", value: "y" },
+          accountProcessed: { label: "Subscriber Wallet", sortable: "y" },
+          endDate: { label: "End Date", sortable: "y" },
+          feeAmount: { label: "Fee", sortable: "y" },
+          frequency: { label: "Frequency", sortable: "y" },
+          lastPaymentDate: { label: "Last Payment Date", sortable: "y" },
+          netAmount: { label: "Net Amount", sortable: "y" },
+          token: { label: "Token ", sortable: "y" }, //!called 'paymentToken' in 'successfulPayment'
+          processor: { label: "Processor", sortable: "y" },
+          startDate: { label: "Start Date", sortable: "y" },
+          subscriptionAmount: { label: "Subscription Amount", sortable: "y" },
+          reason: { label: "Reason", sortable: "y" },
+          transaction: {
+            label: "Transaction (matches batch Id)",
+            sortable: "y",
+          },
         },
       },
       batchData: batchArray,
     };
     console.log(dataFormattedForTable);
+    return dataFormattedForTable;
   };
 
   //3
@@ -472,6 +638,7 @@ function App() {
       <DropdownProcessors processors={processors} setProcessor={setProcessor} />
       <div>Select Network</div>
       <DropdownNetworks networkURLs={networkURLs} setNetwork={setNetwork} />
+      <AccordionTable data={payments} />
       <div>Successful Payments</div>
       <Table data={successfulPayments} />
       <div>Failed Payments</div>
