@@ -1,8 +1,17 @@
 import React from "react";
 
-export const NestedTable = ({ data }: any) => {
+interface NestedTableProps {
+  data: any;
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
+}
+
+export const NestedTable = ({ data, selected, setSelected }: any) => {
   console.log(data);
   console.log(data?.heading);
+  //map these payments I
+  console.log(data?.payments);
+  //inside of each there a transactionId and paymentsArray
 
   return (
     <div className="app-container">
@@ -17,10 +26,15 @@ export const NestedTable = ({ data }: any) => {
           </tr>
         </thead>
         <tbody>
-          {data?.paymentsArray.map((payment: any) => {
+          {data?.payments.map((payment: any) => {
+            // conditional rendering here
+
             return (
-              <tr key={Math.floor(Math.random() * 1000000)}>
-                {payment.map((value: any) => {
+              <tr
+                className={payment.transactionId}
+                key={Math.floor(Math.random() * 1000000)}
+              >
+                {payment.paymentsArray.map((value: any) => {
                   return <td>{value.label}</td>;
                 })}
               </tr>

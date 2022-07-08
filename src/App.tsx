@@ -326,6 +326,7 @@ function App() {
     //3)map batches, and look for matches in all transactions that match the batchId (transaction)
     // when transaction found matching batchId, add it to 'transactioninfoarray', and at last iteration, add transactionInfoArray to batch object.
     //!successful transactions
+
     let batchArray = batches.map((batch: any) => {
       const foundSuccessfulTransactions = data.successfulPayments.filter(
         ({ transaction }: any) => batch.transaction.label === transaction
@@ -347,35 +348,38 @@ function App() {
             subscriptionAmount,
             transaction,
           }: any) => {
-            return [
-              {
-                name: "accountProcessed",
-                label: accountProcessed,
-                value: accountProcessed,
-              },
-              { name: "endDate", label: endDate, value: endDate },
-              { name: "feeAmount", label: feeAmount, value: feeAmount },
-              { name: "frequency", label: frequency, value: frequency },
-              {
-                name: "lastPaymentDate",
-                label: lastPaymentDate,
-                value: lastPaymentDate,
-              },
-              { name: "netAmount", label: netAmount, value: netAmount },
-              {
-                name: "paymentToken",
-                label: paymentToken,
-                value: paymentToken,
-              },
-              { name: "processor", label: processor, value: processor },
-              { name: "startDate", label: startDate, value: startDate },
-              {
-                name: "subscriptionAmount",
-                label: subscriptionAmount,
-                value: subscriptionAmount,
-              },
-              { name: "transaction", label: transaction, value: transaction },
-            ];
+            return {
+              transactionId: transaction,
+              paymentsArray: [
+                {
+                  name: "accountProcessed",
+                  label: accountProcessed,
+                  value: accountProcessed,
+                },
+                { name: "endDate", label: endDate, value: endDate },
+                { name: "feeAmount", label: feeAmount, value: feeAmount },
+                { name: "frequency", label: frequency, value: frequency },
+                {
+                  name: "lastPaymentDate",
+                  label: lastPaymentDate,
+                  value: lastPaymentDate,
+                },
+                { name: "netAmount", label: netAmount, value: netAmount },
+                {
+                  name: "paymentToken",
+                  label: paymentToken,
+                  value: paymentToken,
+                },
+                { name: "processor", label: processor, value: processor },
+                { name: "startDate", label: startDate, value: startDate },
+                {
+                  name: "subscriptionAmount",
+                  label: subscriptionAmount,
+                  value: subscriptionAmount,
+                },
+                { name: "transaction", label: transaction, value: transaction },
+              ],
+            };
           }
         );
       console.log(formattedFoundSuccessfulTransactions);
@@ -400,32 +404,35 @@ function App() {
           reason,
           transaction,
         }: any) => {
-          return [
-            {
-              name: "accountProcessed",
-              label: accountProcessed,
-              value: accountProcessed,
-            },
-            { name: "endDate", label: endDate, value: endDate },
-            { name: "feeAmount", label: feeAmount, value: feeAmount },
-            { name: "frequency", label: frequency, value: frequency },
-            {
-              name: "lastPaymentDate",
-              label: lastPaymentDate,
-              value: lastPaymentDate,
-            },
-            { name: "netAmount", label: netAmount, value: netAmount },
-            { name: "token", label: token, value: token }, //!called 'paymentToken' in 'successfulPayment'
-            { name: "processor", label: processor, value: processor },
-            { name: "startDate", label: startDate, value: startDate },
-            {
-              name: "subscriptionAmount",
-              label: subscriptionAmount,
-              value: subscriptionAmount,
-            },
-            { name: "reason", label: reason, value: reason },
-            { name: "transaction", label: transaction, value: transaction },
-          ];
+          return {
+            transactionId: transaction,
+            paymentsArray: [
+              {
+                name: "accountProcessed",
+                label: accountProcessed,
+                value: accountProcessed,
+              },
+              { name: "endDate", label: endDate, value: endDate },
+              { name: "feeAmount", label: feeAmount, value: feeAmount },
+              { name: "frequency", label: frequency, value: frequency },
+              {
+                name: "lastPaymentDate",
+                label: lastPaymentDate,
+                value: lastPaymentDate,
+              },
+              { name: "netAmount", label: netAmount, value: netAmount },
+              { name: "token", label: token, value: token }, //!called 'paymentToken' in 'successfulPayment'
+              { name: "processor", label: processor, value: processor },
+              { name: "startDate", label: startDate, value: startDate },
+              {
+                name: "subscriptionAmount",
+                label: subscriptionAmount,
+                value: subscriptionAmount,
+              },
+              { name: "reason", label: reason, value: reason },
+              { name: "transaction", label: transaction, value: transaction },
+            ],
+          };
         }
       );
 
@@ -469,7 +476,7 @@ function App() {
                     sortable: "y",
                   }, //'transaction' not strictly needed here
                 ],
-                paymentsArray: formattedFoundSuccessfulTransactions,
+                payments: formattedFoundSuccessfulTransactions,
               },
               failedPayments: {
                 heading: [
@@ -502,7 +509,7 @@ function App() {
                     sortable: "y",
                   },
                 ],
-                paymentsArray: formattedFoundFailedTransactions,
+                payments: formattedFoundFailedTransactions,
               },
             },
           }
@@ -611,6 +618,8 @@ function App() {
 
   const processors: string[] = [
     "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e",
+    "0x71c56de65f9c0462103c35cc4f64b160a58a9227",
+    "0xb7443f7a2333497c7cdca1747a32a9b49160ac11",
     "0x0000000000000000000000000000000000000000",
   ];
 

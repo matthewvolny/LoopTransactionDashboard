@@ -7,6 +7,8 @@ import { Payments } from "../models";
 // }
 
 export const AccordionTable = ({ data }: any) => {
+  const [selected, setSelected] = useState<string>();
+
   console.log(data);
   const batchHeadings = data?.headings.batchHeadings;
   const batchData = data?.batchData;
@@ -28,7 +30,12 @@ export const AccordionTable = ({ data }: any) => {
           {batchData?.map((record: any) => {
             return (
               <>
-                <tr key={Math.floor(Math.random() * 1000000)}>
+                <tr
+                  onClick={(e) => {
+                    setSelected(record.transaction.label);
+                  }}
+                  key={Math.floor(Math.random() * 1000000)}
+                >
                   <td>{record.contractAddress.label}</td>
                   <td>{record.processedForDate.label}</td>
                   <td>{record.transaction.label}</td>
@@ -37,8 +44,12 @@ export const AccordionTable = ({ data }: any) => {
                 })} */}
                 </tr>
                 <tr>
-                  <NestedTable data={record.payments.successfulPayments} />
-                  <NestedTable data={record.payments.failedPayments} />
+                  <NestedTable
+                    data={record.payments.successfulPayments}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+                  {/* <NestedTable data={record.payments.failedPayments} /> */}
                 </tr>
               </>
             );
