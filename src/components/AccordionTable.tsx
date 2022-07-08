@@ -37,7 +37,8 @@ export const AccordionTable = ({ data }: any) => {
                 })} */}
                 </tr>
                 <tr>
-                  <NestedTable />
+                  <NestedTable data={record.payments.successfulPayments} />
+                  <NestedTable data={record.payments.failedPayments} />
                 </tr>
               </>
             );

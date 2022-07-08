@@ -347,52 +347,35 @@ function App() {
             subscriptionAmount,
             transaction,
           }: any) => {
-            return {
-              accountProcessed: {
+            return [
+              {
+                name: "accountProcessed",
                 label: accountProcessed,
                 value: accountProcessed,
               },
-              endDate: {
-                label: endDate,
-                value: endDate,
-              },
-              feeAmount: {
-                label: feeAmount,
-                value: feeAmount,
-              },
-              frequency: {
-                label: frequency,
-                value: frequency,
-              },
-              lastPaymentDate: {
+              { name: "endDate", label: endDate, value: endDate },
+              { name: "feeAmount", label: feeAmount, value: feeAmount },
+              { name: "frequency", label: frequency, value: frequency },
+              {
+                name: "lastPaymentDate",
                 label: lastPaymentDate,
                 value: lastPaymentDate,
               },
-              netAmount: {
-                label: netAmount,
-                value: netAmount,
-              },
-              paymentToken: {
+              { name: "netAmount", label: netAmount, value: netAmount },
+              {
+                name: "paymentToken",
                 label: paymentToken,
                 value: paymentToken,
               },
-              processor: {
-                label: processor,
-                value: processor,
-              },
-              startDate: {
-                label: startDate,
-                value: startDate,
-              },
-              subscriptionAmount: {
+              { name: "processor", label: processor, value: processor },
+              { name: "startDate", label: startDate, value: startDate },
+              {
+                name: "subscriptionAmount",
                 label: subscriptionAmount,
                 value: subscriptionAmount,
               },
-              transaction: {
-                label: transaction,
-                value: transaction,
-              },
-            };
+              { name: "transaction", label: transaction, value: transaction },
+            ];
           }
         );
       console.log(formattedFoundSuccessfulTransactions);
@@ -417,56 +400,32 @@ function App() {
           reason,
           transaction,
         }: any) => {
-          return {
-            accountProcessed: {
+          return [
+            {
+              name: "accountProcessed",
               label: accountProcessed,
               value: accountProcessed,
             },
-            endDate: {
-              label: endDate,
-              value: endDate,
-            },
-            feeAmount: {
-              label: feeAmount,
-              value: feeAmount,
-            },
-            frequency: {
-              label: frequency,
-              value: frequency,
-            },
-            lastPaymentDate: {
+            { name: "endDate", label: endDate, value: endDate },
+            { name: "feeAmount", label: feeAmount, value: feeAmount },
+            { name: "frequency", label: frequency, value: frequency },
+            {
+              name: "lastPaymentDate",
               label: lastPaymentDate,
               value: lastPaymentDate,
             },
-            netAmount: {
-              label: netAmount,
-              value: netAmount,
-            },
-            token: {
-              label: token,
-              value: token,
-            }, //!called 'paymentToken' in 'successfulPayment'
-            processor: {
-              label: processor,
-              value: processor,
-            },
-            startDate: {
-              label: startDate,
-              value: startDate,
-            },
-            subscriptionAmount: {
+            { name: "netAmount", label: netAmount, value: netAmount },
+            { name: "token", label: token, value: token }, //!called 'paymentToken' in 'successfulPayment'
+            { name: "processor", label: processor, value: processor },
+            { name: "startDate", label: startDate, value: startDate },
+            {
+              name: "subscriptionAmount",
               label: subscriptionAmount,
               value: subscriptionAmount,
             },
-            reason: {
-              label: reason,
-              value: reason,
-            },
-            transaction: {
-              label: transaction,
-              value: transaction,
-            },
-          };
+            { name: "reason", label: reason, value: reason },
+            { name: "transaction", label: transaction, value: transaction },
+          ];
         }
       );
 
@@ -476,8 +435,75 @@ function App() {
         ? {
             ...batch,
             payments: {
-              successfulPayments: formattedFoundSuccessfulTransactions,
-              failedPayments: formattedFoundFailedTransactions,
+              successfulPayments: {
+                heading: [
+                  {
+                    name: "accountProcessed",
+                    label: "Subscriber Wallet",
+                    sortable: "y",
+                  },
+                  { name: "endDate", label: "End Date", sortable: "y" },
+                  { name: "feeAmount", label: "Fee", sortable: "y" },
+                  { name: "frequency", label: "Frequency", sortable: "y" },
+                  {
+                    name: "lastPaymentDate",
+                    label: "Last Payment Date",
+                    sortable: "y",
+                  },
+                  { name: "netAmount", label: "Net Amount", sortable: "y" },
+                  {
+                    name: "paymentToken",
+                    label: "paymentToken ",
+                    sortable: "y",
+                  },
+                  { name: "processor", label: "Processor", sortable: "y" },
+                  { name: "startDate", label: "Start Date", sortable: "y" },
+                  {
+                    name: "subscriptionAmount",
+                    label: "Subscription Amount",
+                    sortable: "y",
+                  },
+                  {
+                    name: "transaction",
+                    label: "Transaction (matches batch Id)",
+                    sortable: "y",
+                  }, //'transaction' not strictly needed here
+                ],
+                paymentsArray: formattedFoundSuccessfulTransactions,
+              },
+              failedPayments: {
+                heading: [
+                  {
+                    name: "accountProcessed",
+                    label: "Subscriber Wallet",
+                    sortable: "y",
+                  },
+                  { name: "endDate", label: "End Date", sortable: "y" },
+                  { name: "feeAmount", label: "Fee", sortable: "y" },
+                  { name: "frequency", label: "Frequency", sortable: "y" },
+                  {
+                    name: "lastPaymentDate",
+                    label: "Last Payment Date",
+                    sortable: "y",
+                  },
+                  { name: "netAmount", label: "Net Amount", sortable: "y" },
+                  { name: "token", label: "Token ", sortable: "y" }, //!called 'paymentToken' in 'successfulPayment'
+                  { name: "processor", label: "Processor", sortable: "y" },
+                  { name: "startDate", label: "Start Date", sortable: "y" },
+                  {
+                    name: "subscriptionAmount",
+                    label: "Subscription Amount",
+                    sortable: "y",
+                  },
+                  { name: "reason", label: "Reason", sortable: "y" },
+                  {
+                    name: "transaction",
+                    label: "Transaction (matches batch Id)",
+                    sortable: "y",
+                  },
+                ],
+                paymentsArray: formattedFoundFailedTransactions,
+              },
             },
           }
         : batch;
@@ -492,39 +518,6 @@ function App() {
           { name: "processedForDate", label: "Date", sortable: "y" },
           { name: "transaction", label: "Id", sortable: "y" },
         ],
-        successfulPaymentsHeadings: {
-          accountProcessed: { label: "Subscriber Wallet", sortable: "y" },
-          endDate: { label: "End Date", sortable: "y" },
-          feeAmount: { label: "Fee", sortable: "y" },
-          frequency: { label: "Frequency", sortable: "y" },
-          lastPaymentDate: { label: "Last Payment Date", sortable: "y" },
-          netAmount: { label: "Net Amount", sortable: "y" },
-          paymentToken: { label: "paymentToken ", sortable: "y" },
-          processor: { label: "Processor", sortable: "y" },
-          startDate: { label: "Start Date", sortable: "y" },
-          subscriptionAmount: { label: "Subscription Amount", sortable: "y" },
-          transaction: {
-            label: "Transaction (matches batch Id)",
-            sortable: "y",
-          }, //'transaction' not strictly needed here
-        },
-        failedPaymentsHeadings: {
-          accountProcessed: { label: "Subscriber Wallet", sortable: "y" },
-          endDate: { label: "End Date", sortable: "y" },
-          feeAmount: { label: "Fee", sortable: "y" },
-          frequency: { label: "Frequency", sortable: "y" },
-          lastPaymentDate: { label: "Last Payment Date", sortable: "y" },
-          netAmount: { label: "Net Amount", sortable: "y" },
-          token: { label: "Token ", sortable: "y" }, //!called 'paymentToken' in 'successfulPayment'
-          processor: { label: "Processor", sortable: "y" },
-          startDate: { label: "Start Date", sortable: "y" },
-          subscriptionAmount: { label: "Subscription Amount", sortable: "y" },
-          reason: { label: "Reason", sortable: "y" },
-          transaction: {
-            label: "Transaction (matches batch Id)",
-            sortable: "y",
-          },
-        },
       },
       batchData: batchArray,
     };
