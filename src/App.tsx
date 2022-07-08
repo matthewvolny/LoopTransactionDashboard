@@ -312,17 +312,21 @@ function App() {
     });
     console.log("batches");
     console.log(batches);
+
     //3)loop through array of batches, and look for matches in all transactions that match the batchId (transaction)
     // when transaction found matching batchId, add it to 'transactioninfoarray', and at last iteration, add transactionInfoArray to batch object.
-
-    let transactionInfo = [];
     let batchArray = batches.map((batch: any) => {
       const foundTransactions = payments.successfulPayments.filter(
         ({ transaction }: any) => batch.transaction === transaction
       );
       console.log(foundTransactions);
+      return foundTransactions
+        ? {
+            ...batch,
+            transactionInfo: foundTransactions,
+          }
+        : batch;
     });
-
     console.log(batchArray);
   }, [payments]);
 
