@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { NestedTable } from "./NestedTable";
 import { Payments } from "../models";
 
 // interface TableProps {
@@ -26,12 +27,19 @@ export const AccordionTable = ({ data }: any) => {
         <tbody>
           {batchData?.map((record: any) => {
             return (
-              <tr key={Math.floor(Math.random() * 1000000)}>
-                <td>{record.contractAddress.label}</td>
-                {/* {record.values.map((value) => {
+              <>
+                <tr key={Math.floor(Math.random() * 1000000)}>
+                  <td>{record.contractAddress.label}</td>
+                  <td>{record.processedForDate.label}</td>
+                  <td>{record.transaction.label}</td>
+                  {/* {record.payments.successfulPayments.map((payment) => {
                   return <td>{value.value}</td>;
                 })} */}
-              </tr>
+                </tr>
+                <tr>
+                  <NestedTable />
+                </tr>
+              </>
             );
           })}
         </tbody>
