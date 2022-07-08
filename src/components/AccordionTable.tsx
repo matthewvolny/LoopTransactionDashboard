@@ -7,7 +7,8 @@ import { Payments } from "../models";
 
 export const AccordionTable = ({ data }: any) => {
   console.log(data);
-  let batchHeadings = data?.headings.batchHeadings;
+  const batchHeadings = data?.headings.batchHeadings;
+  const batchData = data?.batchData;
   return (
     <div className="app-container">
       <table className="table">
@@ -23,15 +24,16 @@ export const AccordionTable = ({ data }: any) => {
           </tr>
         </thead>
         <tbody>
-          {/* {data?.records.map((record) => {
+          {batchData?.map((record: any) => {
             return (
-              <tr key={record.id}>
-                {record.values.map((value) => {
+              <tr key={Math.floor(Math.random() * 1000000)}>
+                <td>{record.contractAddress.label}</td>
+                {/* {record.values.map((value) => {
                   return <td>{value.value}</td>;
-                })}
+                })} */}
               </tr>
             );
-          })} */}
+          })}
         </tbody>
       </table>
     </div>
