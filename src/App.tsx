@@ -207,10 +207,11 @@ function App() {
         query: gql(tokensQuery),
       })
       .then((data) => {
-        console.log(data.data);
-        console.log(addSubscriptionDataToPayments(data.data));
-        setPayments(addSubscriptionDataToPayments(data.data));
-
+        // console.log(data.data);
+        // console.log(addSubscriptionDataToPayments(data.data));
+        let detailedPaymentData = addSubscriptionDataToPayments(data.data);
+        console.log(detailedPaymentData);
+        formatPaymentsForTable(detailedPaymentData);
         //successful and failed payments
         // let successfulPayments = data.data.successfulPayments;
         // let failedPayments = data.data.failedPayments;
@@ -287,18 +288,18 @@ function App() {
     };
   };
 
-  useEffect(() => {
+  const formatPaymentsForTable = (data: any) => {
     //1)sort transactions by batchId  (transaction) (may already be sorted by date) - could use some sort of selection sort)
     //2)for each unique batchID push to array(with just "id", "date", "recipient")[{first with unique id},{first with unique id},{etc}]
 
     console.log("payments");
-    console.log(payments);
+    console.log(data);
     type Obj = {
       [key: string]: number;
     };
     let batches: any = [];
     let batchCount: Obj = {};
-    payments.successfulPayments.forEach((payment: any) => {
+    data.successfulPayments.forEach((payment: any) => {
       let batchId = payment.transaction;
       if (!batchCount.batchId) {
         batchCount[batchId] = 1;
@@ -313,68 +314,57 @@ function App() {
     console.log("batches");
     console.log(batches);
 
-    //3)loop through array of batches, and look for matches in all transactions that match the batchId (transaction)
+    //3)map batches, and look for matches in all transactions that match the batchId (transaction)
     // when transaction found matching batchId, add it to 'transactioninfoarray', and at last iteration, add transactionInfoArray to batch object.
+    //!successful transactions
     let batchArray = batches.map((batch: any) => {
-      const foundTransactions = payments.successfulPayments.filter(
+      const foundSuccessfulTransactions = data.successfulPayments.filter(
         ({ transaction }: any) => batch.transaction === transaction
       );
-      console.log(foundTransactions);
-      return foundTransactions
+      console.log(foundSuccessfulTransactions);
+
+      const foundFailedTransactions = data.failedPayments.filter(
+        ({ transaction }: any) => batch.transaction === transaction
+      );
+      console.log(foundFailedTransactions);
+
+      return foundSuccessfulTransactions || foundFailedTransactions
         ? {
             ...batch,
-            transactionInfo: foundTransactions,
+            payments: {
+              successfulPayments: foundSuccessfulTransactions,
+              failedPayments: foundFailedTransactions,
+            },
           }
         : batch;
     });
     console.log(batchArray);
-  }, [payments]);
 
-  //
-  // const found = data.subscriptionDetails.find(
-  //           ({ contractAddress, subscriber }: any) =>
-  //             payment.contractAddress === contractAddress &&
-  //             payment.accountProcessed === subscriber
-  //         );
-
-  // let batchDataArray = [
-  //   {
-  //     batchInfo: {
-  //       id: { label: "x", value: "y" },
-  //       date: { label: "x", value: "y" },
-  //       recipient: { label: "x", value: "y" },
-  //       transactionInfo: [
-  //         {
-  //           subscriber: { label: "x", value: "y" },
-  //           amountTransferred: { label: "x", value: "y" },
-  //           fee: { label: "x", value: "y" },
-  //           tokenId: { label: "x", value: "y" },
-  //           startDate: { label: "x", value: "y" },
-  //           frequency: { label: "x", value: "y" },
-  //           endDate: { label: "x", value: "y" },
-  //           lastPaymentDate: { label: "x", value: "y" },
-  //           paymentToken: { label: "x", value: "y" },
-  //           subscriptionAmount: { label: "x", value: "y" },
-  //         },
-  //       ],
-  //     },
-  //   },
-  //   {
-  //     batchInfo: {
-  //       id: { label: "x", value: "y" },
-  //       date: { label: "x", value: "y" },
-  //       recipient: { label: "x", value: "y" },
-  //       transactionInfo: [
-  //         {
-  //           subscriber: { label: "x", value: "y" },
-  //           amountTransferred: { label: "x", value: "y" },
-  //           fee: { label: "x", value: "y" },
-  //           tokenId: { label: "x", value: "y" },
-  //         },
-  //       ],
-  //     },
-  //   },
-  // ];
+    //add headings
+    const dataFormattedForTable = {
+      headings: {
+        batchHeadings: {
+          id: { label: "x", sortable: "y" },
+          date: { label: "x", sortable: "y" },
+          recipient: { label: "x", sortable: "y" },
+        },
+        successfulPaymentsHeadings: {
+          subscriber: { label: "x", value: "y" },
+          amountTransferred: { label: "x", value: "y" },
+          fee: { label: "x", value: "y" },
+          tokenId: { label: "x", value: "y" },
+        },
+        failedPaymentsHeadings: {
+          subscriber: { label: "x", value: "y" },
+          amountTransferred: { label: "x", value: "y" },
+          fee: { label: "x", value: "y" },
+          tokenId: { label: "x", value: "y" },
+        },
+      },
+      batchData: batchArray,
+    };
+    console.log(dataFormattedForTable);
+  };
 
   //3
   const formatSuccessfulPayments = (transaction: any) => {
