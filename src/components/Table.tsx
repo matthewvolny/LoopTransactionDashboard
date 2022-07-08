@@ -6,8 +6,8 @@ interface TableProps {
 }
 
 export const Table = ({ data }: TableProps) => {
-  console.log(data);
-  console.log(data?.records);
+  //   console.log(data);
+  //   console.log(data?.records);
 
   return (
     <div className="app-container">

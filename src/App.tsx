@@ -7,7 +7,10 @@ import { DropdownProcessors } from "./components/DropdownProcessors";
 import { DropdownNetworks } from "./components/DropdownNetworks";
 import { PaymentTypeSelector } from "./components/PaymentTypeSelector";
 import "./App.css";
-import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
+import {
+  createEmitAndSemanticDiagnosticsBuilderProgram,
+  isTemplateExpression,
+} from "typescript";
 // import { Container } from "./components/Container.styled";
 
 // let batchDataArray = [
@@ -125,7 +128,7 @@ import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
 function App() {
   const [successfulPayments, setSuccessfulPayments] = useState<Payments>();
   const [failedPayments, setFailedPayments] = useState<Payments>();
-  const [payments, setPayments] = useState();
+  const [payments, setPayments] = useState<any>();
   const [processor, setProcessor] = useState<string>(
     "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e"
   );
@@ -205,6 +208,7 @@ function App() {
       })
       .then((data) => {
         console.log(data.data);
+        console.log(addSubscriptionDataToPayments(data.data));
         setPayments(addSubscriptionDataToPayments(data.data));
 
         //successful and failed payments
@@ -278,10 +282,95 @@ function App() {
       }
     );
     return {
-      SuccessfulPayments: detailedSuccessfulPaymentsData,
+      successfulPayments: detailedSuccessfulPaymentsData,
       failedPayments: detailedFailedPaymentsData,
     };
   };
+
+  useEffect(() => {
+    //1)sort transactions by batchId  (transaction) (may already be sorted by date) - could use some sort of selection sort)
+    //2)for each unique batchID push to array(with just "id", "date", "recipient")[{first with unique id},{first with unique id},{etc}]
+
+    console.log("payments");
+    console.log(payments);
+    type Obj = {
+      [key: string]: number;
+    };
+    let batches: any = [];
+    let batchCount: Obj = {};
+    payments.successfulPayments.forEach((payment: any) => {
+      let batchId = payment.transaction;
+      if (!batchCount.batchId) {
+        batchCount[batchId] = 1;
+        //can modify to push { label: "x", value: "y" }
+        batches.push({
+          transaction: batchId,
+          processedForDate: payment.processedForDate,
+          contractAddress: payment.contractAddress,
+        });
+      }
+    });
+    console.log("batches");
+    console.log(batches);
+    //3)loop through array of batches, and look for matches in all transactions that match the batchId (transaction)
+    // when transaction found matching batchId, add it to 'transactioninfoarray', and at last iteration, add transactionInfoArray to batch object.
+
+    let transactionInfo = [];
+    let batchArray = batches.map((batch: any) => {
+      const foundTransactions = payments.successfulPayments.filter(
+        ({ transaction }: any) => batch.transaction === transaction
+      );
+      console.log(foundTransactions);
+    });
+
+    console.log(batchArray);
+  }, [payments]);
+
+  //
+  // const found = data.subscriptionDetails.find(
+  //           ({ contractAddress, subscriber }: any) =>
+  //             payment.contractAddress === contractAddress &&
+  //             payment.accountProcessed === subscriber
+  //         );
+
+  // let batchDataArray = [
+  //   {
+  //     batchInfo: {
+  //       id: { label: "x", value: "y" },
+  //       date: { label: "x", value: "y" },
+  //       recipient: { label: "x", value: "y" },
+  //       transactionInfo: [
+  //         {
+  //           subscriber: { label: "x", value: "y" },
+  //           amountTransferred: { label: "x", value: "y" },
+  //           fee: { label: "x", value: "y" },
+  //           tokenId: { label: "x", value: "y" },
+  //           startDate: { label: "x", value: "y" },
+  //           frequency: { label: "x", value: "y" },
+  //           endDate: { label: "x", value: "y" },
+  //           lastPaymentDate: { label: "x", value: "y" },
+  //           paymentToken: { label: "x", value: "y" },
+  //           subscriptionAmount: { label: "x", value: "y" },
+  //         },
+  //       ],
+  //     },
+  //   },
+  //   {
+  //     batchInfo: {
+  //       id: { label: "x", value: "y" },
+  //       date: { label: "x", value: "y" },
+  //       recipient: { label: "x", value: "y" },
+  //       transactionInfo: [
+  //         {
+  //           subscriber: { label: "x", value: "y" },
+  //           amountTransferred: { label: "x", value: "y" },
+  //           fee: { label: "x", value: "y" },
+  //           tokenId: { label: "x", value: "y" },
+  //         },
+  //       ],
+  //     },
+  //   },
+  // ];
 
   //3
   const formatSuccessfulPayments = (transaction: any) => {
