@@ -46,3 +46,11 @@ form td:last-child {
 form * {
   font-size: 28px;
 }
+
+.hidden {
+  display: none;
+}
+
+#visible {
+  display: contents;
+}

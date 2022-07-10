@@ -348,38 +348,35 @@ function App() {
             subscriptionAmount,
             transaction,
           }: any) => {
-            return {
-              transactionId: transaction,
-              paymentsArray: [
-                {
-                  name: "accountProcessed",
-                  label: accountProcessed,
-                  value: accountProcessed,
-                },
-                { name: "endDate", label: endDate, value: endDate },
-                { name: "feeAmount", label: feeAmount, value: feeAmount },
-                { name: "frequency", label: frequency, value: frequency },
-                {
-                  name: "lastPaymentDate",
-                  label: lastPaymentDate,
-                  value: lastPaymentDate,
-                },
-                { name: "netAmount", label: netAmount, value: netAmount },
-                {
-                  name: "paymentToken",
-                  label: paymentToken,
-                  value: paymentToken,
-                },
-                { name: "processor", label: processor, value: processor },
-                { name: "startDate", label: startDate, value: startDate },
-                {
-                  name: "subscriptionAmount",
-                  label: subscriptionAmount,
-                  value: subscriptionAmount,
-                },
-                { name: "transaction", label: transaction, value: transaction },
-              ],
-            };
+            return [
+              {
+                name: "accountProcessed",
+                label: accountProcessed,
+                value: accountProcessed,
+              },
+              { name: "endDate", label: endDate, value: endDate },
+              { name: "feeAmount", label: feeAmount, value: feeAmount },
+              { name: "frequency", label: frequency, value: frequency },
+              {
+                name: "lastPaymentDate",
+                label: lastPaymentDate,
+                value: lastPaymentDate,
+              },
+              { name: "netAmount", label: netAmount, value: netAmount },
+              {
+                name: "paymentToken",
+                label: paymentToken,
+                value: paymentToken,
+              },
+              { name: "processor", label: processor, value: processor },
+              { name: "startDate", label: startDate, value: startDate },
+              {
+                name: "subscriptionAmount",
+                label: subscriptionAmount,
+                value: subscriptionAmount,
+              },
+              { name: "transaction", label: transaction, value: transaction },
+            ];
           }
         );
       console.log(formattedFoundSuccessfulTransactions);
@@ -404,35 +401,32 @@ function App() {
           reason,
           transaction,
         }: any) => {
-          return {
-            transactionId: transaction,
-            paymentsArray: [
-              {
-                name: "accountProcessed",
-                label: accountProcessed,
-                value: accountProcessed,
-              },
-              { name: "endDate", label: endDate, value: endDate },
-              { name: "feeAmount", label: feeAmount, value: feeAmount },
-              { name: "frequency", label: frequency, value: frequency },
-              {
-                name: "lastPaymentDate",
-                label: lastPaymentDate,
-                value: lastPaymentDate,
-              },
-              { name: "netAmount", label: netAmount, value: netAmount },
-              { name: "token", label: token, value: token }, //!called 'paymentToken' in 'successfulPayment'
-              { name: "processor", label: processor, value: processor },
-              { name: "startDate", label: startDate, value: startDate },
-              {
-                name: "subscriptionAmount",
-                label: subscriptionAmount,
-                value: subscriptionAmount,
-              },
-              { name: "reason", label: reason, value: reason },
-              { name: "transaction", label: transaction, value: transaction },
-            ],
-          };
+          return [
+            {
+              name: "accountProcessed",
+              label: accountProcessed,
+              value: accountProcessed,
+            },
+            { name: "endDate", label: endDate, value: endDate },
+            { name: "feeAmount", label: feeAmount, value: feeAmount },
+            { name: "frequency", label: frequency, value: frequency },
+            {
+              name: "lastPaymentDate",
+              label: lastPaymentDate,
+              value: lastPaymentDate,
+            },
+            { name: "netAmount", label: netAmount, value: netAmount },
+            { name: "token", label: token, value: token }, //!called 'paymentToken' in 'successfulPayment'
+            { name: "processor", label: processor, value: processor },
+            { name: "startDate", label: startDate, value: startDate },
+            {
+              name: "subscriptionAmount",
+              label: subscriptionAmount,
+              value: subscriptionAmount,
+            },
+            { name: "reason", label: reason, value: reason },
+            { name: "transaction", label: transaction, value: transaction },
+          ];
         }
       );
 
@@ -476,7 +470,7 @@ function App() {
                     sortable: "y",
                   }, //'transaction' not strictly needed here
                 ],
-                payments: formattedFoundSuccessfulTransactions,
+                paymentsArray: formattedFoundSuccessfulTransactions,
               },
               failedPayments: {
                 heading: [
@@ -509,7 +503,7 @@ function App() {
                     sortable: "y",
                   },
                 ],
-                payments: formattedFoundFailedTransactions,
+                paymentsArray: formattedFoundFailedTransactions,
               },
             },
           }
@@ -641,10 +635,6 @@ function App() {
       <div>Select Network</div>
       <DropdownNetworks networkURLs={networkURLs} setNetwork={setNetwork} />
       <AccordionTable data={payments} />
-      <div>Successful Payments</div>
-      <Table data={successfulPayments} />
-      <div>Failed Payments</div>
-      <Table data={failedPayments} />
     </div>
   );
 }

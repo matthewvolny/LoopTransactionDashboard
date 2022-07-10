@@ -26,15 +26,10 @@ export const NestedTable = ({ data, selected, setSelected }: any) => {
           </tr>
         </thead>
         <tbody>
-          {data?.payments.map((payment: any) => {
-            // conditional rendering here
-
+          {data?.paymentsArray.map((payment: any) => {
             return (
-              <tr
-                className={payment.transactionId}
-                key={Math.floor(Math.random() * 1000000)}
-              >
-                {payment.paymentsArray.map((value: any) => {
+              <tr key={Math.floor(Math.random() * 1000000)}>
+                {payment.map((value: any) => {
                   return <td>{value.label}</td>;
                 })}
               </tr>
