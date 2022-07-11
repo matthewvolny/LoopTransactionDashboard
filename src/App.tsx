@@ -8,127 +8,15 @@ import { DropdownProcessors } from "./components/DropdownProcessors";
 import { DropdownNetworks } from "./components/DropdownNetworks";
 import { PaymentTypeSelector } from "./components/PaymentTypeSelector";
 import "./App.css";
-import {
-  createEmitAndSemanticDiagnosticsBuilderProgram,
-  isTemplateExpression,
-} from "typescript";
-// import { Container } from "./components/Container.styled";
-
-// let batchDataArray = [
-//   {
-//     batchInfo: {
-//       id: { label: "x", value: "y" },
-//       date: { label: "x", value: "y" },
-//       recipient: { label: "x", value: "y" },
-//       transactionInfo: [
-//         {
-//           subscriber: { label: "x", value: "y" },
-//           amountTransferred: { label: "x", value: "y" },
-//           fee: { label: "x", value: "y" },
-//           tokenId: { label: "x", value: "y" },
-//         },
-//         {
-//           subscriber: { label: "x", value: "y" },
-//           amountTransferred: { label: "x", value: "y" },
-//           fee: { label: "x", value: "y" },
-//           tokenId: { label: "x", value: "y" },
-//         },
-//       ],
-//     },
-//   },
-//   {
-//     batchInfo: {
-//       id: { label: "x", value: "y" },
-//       date: { label: "x", value: "y" },
-//       recipient: { label: "x", value: "y" },
-//       transactionInfo: [
-//         {
-//           subscriber: { label: "x", value: "y" },
-//           amountTransferred: { label: "x", value: "y" },
-//           fee: { label: "x", value: "y" },
-//           tokenId: { label: "x", value: "y" },
-//         },
-//       ],
-//     },
-//   },
-// ];
-
-// const successfulPaymentsDataForTable = {
-//   batchHeadings: {
-//     id: { label: "x", sortable: "y" },
-//     date: { label: "x", sortable: "y" },
-//     recipient: { label: "x", sortable: "y" },
-//   },
-//   transactionHeadings: {
-//     subscriber: { label: "x", value: "y" },
-//     amountTransferred: { label: "x", value: "y" },
-//     fee: { label: "x", value: "y" },
-//     tokenId: { label: "x", value: "y" },
-//   },
-//   batchDataArray: [
-//     {
-//       batchInfo: {
-//         id: { label: "x", value: "y" },
-//         date: { label: "x", value: "y" },
-//         recipient: { label: "x", value: "y" },
-//         transactionInfo: [
-//           {
-//             subscriber: { label: "x", value: "y" },
-//             amountTransferred: { label: "x", value: "y" },
-//             fee: { label: "x", value: "y" },
-//             tokenId: { label: "x", value: "y" },
-//           },
-//           {
-//             subscriber: { label: "x", value: "y" },
-//             amountTransferred: { label: "x", value: "y" },
-//             fee: { label: "x", value: "y" },
-//             tokenId: { label: "x", value: "y" },
-//           },
-//         ],
-//       },
-//     },
-//     {
-//       batchInfo: {
-//         id: { label: "x", value: "y" },
-//         date: { label: "x", value: "y" },
-//         recipient: { label: "x", value: "y" },
-//         transactionInfo: [
-//           {
-//             subscriber: { label: "x", value: "y" },
-//             amountTransferred: { label: "x", value: "y" },
-//             fee: { label: "x", value: "y" },
-//             tokenId: { label: "x", value: "y" },
-//           },
-//           {
-//             subscriber: { label: "x", value: "y" },
-//             amountTransferred: { label: "x", value: "y" },
-//             fee: { label: "x", value: "y" },
-//             tokenId: { label: "x", value: "y" },
-//           },
-//         ],
-//       },
-//     },
-//   ],
-// };
-
-//Rinkeby contract address =  "0xc11c7719689562be72c867e573bd7a84e2777dc3"
-//Polygon contract addresses = "0x6790242ca72e488e43d388947667ad207f5094c5", "0xa20867f95822561eedc81fdea7faf8b965348417"
-
-// example query from shane
-// {
-//   subscriptionDetails (where:{contractAddress: "0x6790242ca72e488e43d388947667ad207f5094c5", subscriber:"0x38487e6147928c014a749795a04b67ccc95efe61"}) {
-//     paymentTokenSymbol
-//   }
-// }
 
 //!for getting specific tokenid for contract address:
-//1)loop through all account addresses, push each unique address to object(as key)
-//2)make fetch requests for each key, tokenId is value for key(address).
-//3)loop through all account addresses adding appropriate tokenId
+//!1)loop through all account addresses, push each unique address to object(as key)
+//!2)make fetch requests for each key, tokenId is value for key(address).
+//!3)loop through all account addresses adding appropriate tokenId
 
 function App() {
-  const [successfulPayments, setSuccessfulPayments] = useState<Payments>();
-  const [failedPayments, setFailedPayments] = useState<Payments>();
+  // const [successfulPayments, setSuccessfulPayments] = useState<Payments>();
+  // const [failedPayments, setFailedPayments] = useState<Payments>();
   const [payments, setPayments] = useState<any>();
   const [processor, setProcessor] = useState<string>(
     "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e"
@@ -142,26 +30,26 @@ function App() {
     fetchPaymentInfo(processor, network);
   }, [processor, network]);
 
-  const headings = {
-    successfulPaymentHeadings: [
-      { label: `Batch Id (transaction)`, sortable: true },
-      { label: `Recipient (contractAddress)`, sortable: true },
-      { label: `processor`, sortable: true },
-      { label: `Subscriber (accountProcessed)`, sortable: true },
-      { label: `Date (processedForDate)`, sortable: true },
-      { label: `feeAmount`, sortable: true },
-      { label: `Total Amount Transferred (netAmount)`, sortable: true },
-      { label: `paymentToken`, sortable: true },
-    ],
-    failedPaymentHeadings: [
-      { label: `Batch Id (transaction)`, sortable: true },
-      { label: `Recipient (contractAddress)`, sortable: true },
-      { label: `processor`, sortable: true },
-      { label: `Subscriber (accountProcessed)`, sortable: true },
-      { label: `token`, sortable: true },
-      { label: `reason`, sortable: true },
-    ],
-  };
+  // const headings = {
+  //   successfulPaymentHeadings: [
+  //     { label: `Batch Id (transaction)`, sortable: true },
+  //     { label: `Recipient (contractAddress)`, sortable: true },
+  //     { label: `processor`, sortable: true },
+  //     { label: `Subscriber (accountProcessed)`, sortable: true },
+  //     { label: `Date (processedForDate)`, sortable: true },
+  //     { label: `feeAmount`, sortable: true },
+  //     { label: `Total Amount Transferred (netAmount)`, sortable: true },
+  //     { label: `paymentToken`, sortable: true },
+  //   ],
+  //   failedPaymentHeadings: [
+  //     { label: `Batch Id (transaction)`, sortable: true },
+  //     { label: `Recipient (contractAddress)`, sortable: true },
+  //     { label: `processor`, sortable: true },
+  //     { label: `Subscriber (accountProcessed)`, sortable: true },
+  //     { label: `token`, sortable: true },
+  //     { label: `reason`, sortable: true },
+  //   ],
+  // };
 
   //2
   const fetchPaymentInfo = (processor: string, network: string) => {
@@ -236,31 +124,49 @@ function App() {
       });
   };
 
+  //!create a lookup table
   const addSubscriptionDataToPayments = (data: any) => {
-    // Loop through the objects in data.successfulPayments...
+    const subscriptions = {};
+
+    data.subscriptionDetails.forEach((subscription: any) => {
+      //@ts-ignore
+      subscriptions[
+        `${subscription.contractAddress}-${subscription.subscriber}`
+      ] = subscription;
+    });
+    console.log("subscriptions");
+    console.log("SUBSCRIPTIONS: ", subscriptions);
+
     const detailedSuccessfulPaymentsData = data.successfulPayments.map(
       (payment: any) => {
-        // Search for an object in data.subscriptionDetails with the same contractAddress and accountProcessed/subscriber
-        const found = data.subscriptionDetails.find(
-          ({ contractAddress, subscriber }: any) =>
-            payment.contractAddress === contractAddress &&
-            payment.accountProcessed === subscriber
-        );
-        // If you find an object that matches, copy all properties from the original object and overwrite some
-        // If you didn't find a match, just return the original object as is
-        return found
-          ? {
-              ...payment,
-              startDate: found.startDate,
-              frequency: found.frequency,
-              endDate: found.endDate,
-              lastPaymentDate: found.lastPaymentDate,
-              paymentToken: found.paymentToken,
-              subscriptionAmount: found.subscriptionAmount,
-            }
-          : payment;
+        let subscriptionIdentifier = `${payment.contractAddress}-${payment.accountProcessed}`;
+        //@ts-ignore
+        if (subscriptions[subscriptionIdentifier]) {
+          //@ts-ignore
+          console.log("FOUND:", subscriptions[subscriptionIdentifier]);
+          //@ts-ignore
+          const {
+            startDate,
+            frequency,
+            endDate,
+            lastPaymentDate,
+            paymentToken,
+            subscriptionAmount,
+            //@ts-ignore
+          } = subscriptions[subscriptionIdentifier];
+          return {
+            ...payment,
+            startDate,
+            frequency,
+            endDate,
+            lastPaymentDate,
+            paymentToken,
+            subscriptionAmount,
+          };
+        }
       }
     );
+    console.log("DETAILED: ", detailedSuccessfulPaymentsData);
 
     const detailedFailedPaymentsData = data.failedPayments.map(
       (payment: any) => {
