@@ -7,8 +7,8 @@ interface NestedTableProps {
 }
 
 export const NestedTable = ({ data, selected, setSelected }: any) => {
-  console.log("INNESTEDTABLE");
-  console.log(data);
+  // console.log("INNESTEDTABLE");
+  // console.log(data);
   // console.log(data?.heading);
   //map these payments I
   // console.log(data?.payments);

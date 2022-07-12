@@ -10,7 +10,7 @@ export const AccordionTable = ({ data }: any) => {
   const [visibleTransactionIds, setVisibleTransactionsId] = useState<string[]>(
     []
   );
-  console.log("ACCORDIONDATA", data);
+  // console.log("ACCORDIONDATA", data);
   const batchHeadings = data?.headings.batchHeadings;
   const batchData = data?.batchData;
 
