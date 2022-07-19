@@ -6,12 +6,18 @@
 }
 
 .app-container {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 1rem;
+  padding: 1rem; */
+  width: 90%;
+  margin: 0 auto;
 }
 
+.payments-label {
+  color: purple;
+  margin: 1.5rem 0rem;
+}
 table {
   border-collapse: collapse;
   width: 100%;

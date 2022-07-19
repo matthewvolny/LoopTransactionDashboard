@@ -42,7 +42,7 @@ export const AccordionTable = ({ data }: any) => {
   };
 
   return (
-    <div className="app-container">
+    <div>
       <table className="table">
         <thead>
           <tr>
@@ -63,15 +63,18 @@ export const AccordionTable = ({ data }: any) => {
                   onClick={(e) => {
                     // setSelected("abc" + record.transaction.label);
                     toggleTransactions("abc" + record.transaction.label);
-                    // call a function instead of using useffect
                   }}
-                  key={Math.floor(Math.random() * 1000000)}
+                  key={record.transaction.label}
                 >
-                  <td>{record.contractAddress.label}</td>
-                  <td>{record.processedForDate.label}</td>
                   <td>{record.transaction.label}</td>
+                  {record.processedForDate ? (
+                    <td>{record.processedForDate.label}</td>
+                  ) : (
+                    <td>{record.createdAt.label}</td>
+                  )}
+                  <td>{record.contractAddress.label}</td>
                 </tr>
-                <tr
+                <div
                   className={
                     "abc" +
                     record.transaction.label +
@@ -79,11 +82,11 @@ export const AccordionTable = ({ data }: any) => {
                     " nested-table"
                   }
                 >
-                  <div>Successful Payments</div>
+                  <div className="payments-label">Successful Payments</div>
                   <NestedTable data={record.payments.successfulPayments} />
-                  <div>Failed Payments</div>
+                  <div className="payments-label">Failed Payments</div>
                   <NestedTable data={record.payments.failedPayments} />
-                </tr>
+                </div>
               </>
             );
           })}

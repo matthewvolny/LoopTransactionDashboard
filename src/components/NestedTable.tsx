@@ -15,7 +15,7 @@ export const NestedTable = ({ data, selected, setSelected }: any) => {
   //inside of each there a transactionId and paymentsArray
 
   return (
-    <div className="app-container">
+    <div>
       <table className="table">
         <thead>
           <tr>

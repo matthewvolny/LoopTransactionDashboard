@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { Payments, NetworkInfo } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
+import { shortenHash } from "./utils/shortenHash";
 import { Table } from "./components/Table";
 import { AccordionTable } from "./components/AccordionTable";
 import { DropdownProcessors } from "./components/DropdownProcessors";
@@ -15,8 +16,6 @@ import "./App.css";
 //!3)loop through all account addresses adding appropriate tokenId
 
 function App() {
-  // const [successfulPayments, setSuccessfulPayments] = useState<Payments>();
-  // const [failedPayments, setFailedPayments] = useState<Payments>();
   const [payments, setPayments] = useState<any>();
   const [processor, setProcessor] = useState<string>(
     "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e"
@@ -44,6 +43,7 @@ function App() {
     feeAmount
     netAmount
     paymentToken
+    createdAt
   }
   failedPayments (where: {processor: "${processor}"}) {
     transaction
@@ -52,6 +52,7 @@ function App() {
     accountProcessed
     token
     reason
+    createdAt
   }
   subscriptionDetails{
     transaction 
@@ -75,31 +76,17 @@ function App() {
         query: gql(tokensQuery),
       })
       .then((data) => {
-        // console.log(data.data);
         let detailedPaymentData = addSubscriptionDataToPayments(data.data);
-        console.log(detailedPaymentData);
+        console.log("detailedPaymentData", detailedPaymentData);
         let paymentBatches = createPaymentBatchesObject(detailedPaymentData);
-        console.log(paymentBatches);
-        //!right here
-        formatPaymentsForTable(paymentBatches, detailedPaymentData);
+        console.log("paymentBatches", paymentBatches);
+        console.log(
+          "formatted for table",
+          formatPaymentsForTable(paymentBatches, detailedPaymentData)
+        );
         setPayments(
           formatPaymentsForTable(paymentBatches, detailedPaymentData)
         );
-        //successful and failed payments
-        // let successfulPayments = data.data.successfulPayments;
-        // let failedPayments = data.data.failedPayments;
-        // setSuccessfulPayments({
-        //   headings: headings.successfulPaymentHeadings,
-        //   records: successfulPayments.map((transaction: any) => {
-        //     return formatSuccessfulPayments(transaction);
-        //   }),
-        // });
-        // setFailedPayments({
-        //   headings: headings.failedPaymentHeadings,
-        //   records: failedPayments.map((transaction: any) => {
-        //     return formatFailedPayments(transaction);
-        //   }),
-        // });
       })
       .catch((err) => {
         console.log("Error fetching data: ", err);
@@ -109,14 +96,13 @@ function App() {
   //adds subscription data properties to successful and failed payments - used a 'lookup table
   const addSubscriptionDataToPayments = (data: any) => {
     const subscriptions = {};
+
     data.subscriptionDetails.forEach((subscription: any) => {
       //@ts-ignore
       subscriptions[
         `${subscription.contractAddress}-${subscription.subscriber}`
       ] = subscription;
     });
-    console.log("subscriptions");
-    console.log("SUBSCRIPTIONS: ", subscriptions);
 
     const detailedSuccessfulPaymentsData = data.successfulPayments.map(
       (payment: any) => {
@@ -124,7 +110,7 @@ function App() {
         //@ts-ignore
         if (subscriptions[subscriptionIdentifier]) {
           //@ts-ignore
-          console.log("FOUND:", subscriptions[subscriptionIdentifier]);
+          // console.log("FOUND:", subscriptions[subscriptionIdentifier]);
           //@ts-ignore
           const {
             startDate,
@@ -147,7 +133,7 @@ function App() {
         }
       }
     );
-    console.log("DETAILED: ", detailedSuccessfulPaymentsData);
+    // console.log("DETAILED: ", detailedSuccessfulPaymentsData);
 
     const detailedFailedPaymentsData = data.failedPayments.map(
       (payment: any) => {
@@ -155,7 +141,7 @@ function App() {
         //@ts-ignore
         if (subscriptions[subscriptionIdentifier]) {
           //@ts-ignore
-          console.log("FOUNDFAILED:", subscriptions[subscriptionIdentifier]);
+          //console.log("FOUNDFAILED:", subscriptions[subscriptionIdentifier]);
           //@ts-ignore
           const {
             startDate,
@@ -178,7 +164,7 @@ function App() {
         }
       }
     );
-    console.log("DETAILEDFAILED: ", detailedFailedPaymentsData);
+    // console.log("DETAILEDFAILED: ", detailedFailedPaymentsData);
 
     return {
       successfulPayments: detailedSuccessfulPaymentsData,
@@ -186,28 +172,31 @@ function App() {
     };
   };
 
+  //!get advice on refactoring this function
   //create payment batches object
   const createPaymentBatchesObject = (detailedPaymentData: any) => {
     //for each unique batchID push batch info to array(with just "id", "date", "recipient")
-    // console.log("payments");
-    // console.log(detailedPaymentData);
+
+    //build transaction batches array (has failed and successful batches)
+    let batches: any = [];
+
     type Obj = {
       [key: string]: number;
     };
 
-    //build transaction batches object
-    let batches: any = { successfulBatches: [], failedBatches: [] };
     let batchCount: Obj = {};
     //create successful batches array
-    const createSuccessfulBatchesArray = (successfulPayments: any) => {
+    const addSuccessfulBatchesToArray = (successfulPayments: any) => {
       successfulPayments.forEach((payment: any) => {
         let batchId = payment.transaction;
         if (!batchCount.batchId) {
           batchCount[batchId] = 1;
-          batches.successfulBatches.push({
-            transaction: { label: batchId, value: batchId },
+          batches.push({
+            transaction: { label: shortenHash(batchId), value: batchId },
             processedForDate: {
-              label: payment.processedForDate,
+              label: formatDateTimeFromSeconds(
+                Number(payment.processedForDate)
+              ),
               value: payment.processedForDate,
             },
             contractAddress: {
@@ -218,17 +207,16 @@ function App() {
         }
       });
     };
-
     //create failed batches array
-    const createFailedBatchesArray = (failedPayments: any) => {
+    const addFailedBatchesToArray = (failedPayments: any) => {
       failedPayments.forEach((payment: any) => {
         let batchId = payment.transaction;
         if (!batchCount.batchId) {
           batchCount[batchId] = 1;
-          batches.failedBatches.push({
+          batches.push({
             transaction: { label: batchId, value: batchId },
-            processedForDate: {
-              label: payment.createdAt, //!this is distinct for failed batches
+            createdAt: {
+              label: formatDateTimeFromSeconds(Number(payment.createdAt)), //!this is distinct for failed batches
               value: payment.createdAt, //!this is distinct for failed batches
             },
             contractAddress: {
@@ -240,24 +228,22 @@ function App() {
       });
     };
 
-    createSuccessfulBatchesArray(detailedPaymentData.successfulPayments);
-    createFailedBatchesArray(detailedPaymentData.failedPayments);
+    addSuccessfulBatchesToArray(detailedPaymentData.successfulPayments);
+    addFailedBatchesToArray(detailedPaymentData.failedPayments);
 
-    //  console.log("batches");
-    //  console.log(batches);
     return batches;
   };
 
-  const formatPaymentsForTable = (batches: any, data: any) => {
-    //3)map batches, and look for matches in all transactions that match the batchId (transaction)
-    // when transaction found matching batchId, add it to 'transactioninfoarray', and at last iteration, add transactionInfoArray to batch object.
-    //!only finding transactions from successful batches array
-    let batchArray = batches.successfulBatches.map((batch: any) => {
-      //!find successful transactions for a given batchId
-      const foundSuccessfulTransactions = data.successfulPayments.filter(
-        ({ transaction }: any) => batch.transaction.label === transaction
-      );
-      // console.log(foundSuccessfulTransactions);
+  //3)map batches, and look for matches in all transactions that match the batchId (transaction)
+  // when transaction found matching batchId, add it to 'transactioninfoarray', and at last iteration, add transactionInfoArray to batch object.
+  const formatPaymentsForTable = (batches: any, detailedPaymentData: any) => {
+    let batchArray = batches.map((batch: any) => {
+      //find successful transactions for a given batchId
+      const foundSuccessfulTransactions =
+        detailedPaymentData.successfulPayments.filter(
+          ({ transaction }: any) => batch.transaction.value === transaction
+        );
+      // console.log("foundSuccessfulTransactions", foundSuccessfulTransactions);
 
       const formattedFoundSuccessfulTransactions =
         foundSuccessfulTransactions.map(
@@ -273,6 +259,8 @@ function App() {
             startDate,
             subscriptionAmount,
             transaction,
+            createdAt,
+            processedForDate,
           }: any) => {
             return [
               {
@@ -302,16 +290,21 @@ function App() {
                 value: subscriptionAmount,
               },
               { name: "transaction", label: transaction, value: transaction },
+              { name: "createdAt", label: createdAt, value: createdAt },
+              {
+                name: "timeTakenToProcessTransaction",
+                label: createdAt - processedForDate,
+                value: createdAt - processedForDate,
+              },
             ];
           }
         );
-      // console.log(formattedFoundSuccessfulTransactions);
 
-      //!find failed transactions for a given batchId
-      const foundFailedTransactions = data.failedPayments.filter(
-        ({ transaction }: any) => batch.transaction.label === transaction
+      //find failed transactions for a given batchId
+      const foundFailedTransactions = detailedPaymentData.failedPayments.filter(
+        ({ transaction }: any) => batch.transaction.value === transaction
       );
-      // console.log(foundFailedTransactions);
+      // console.log("foundFailedTransactions", foundFailedTransactions);
 
       const formattedFoundFailedTransactions = foundFailedTransactions.map(
         ({
@@ -324,7 +317,6 @@ function App() {
           token, //!called 'paymentToken' in 'successfulPayment'
           processor,
           startDate,
-          createdAt,
           subscriptionAmount,
           reason,
           transaction,
@@ -358,8 +350,7 @@ function App() {
         }
       );
 
-      console.log(formattedFoundFailedTransactions);
-
+      // console.log(formattedFoundFailedTransactions);
       return foundSuccessfulTransactions || foundFailedTransactions
         ? {
             ...batch,
@@ -396,7 +387,17 @@ function App() {
                     name: "transaction",
                     label: "Transaction (matches batch Id)",
                     sortable: "y",
-                  }, //'transaction' not strictly needed here
+                  }, //!'transaction' not strictly needed here
+                  {
+                    name: "createdAt",
+                    label: "createdAt",
+                    sortable: "y",
+                  },
+                  {
+                    name: "timeTakenToProcessTransaction",
+                    label: "timeTakenToProcessTransaction",
+                    sortable: "y",
+                  },
                 ],
                 paymentsArray: formattedFoundSuccessfulTransactions,
               },
@@ -419,6 +420,11 @@ function App() {
                   { name: "token", label: "Token ", sortable: "y" }, //!called 'paymentToken' in 'successfulPayment'
                   { name: "processor", label: "Processor", sortable: "y" },
                   { name: "startDate", label: "Start Date", sortable: "y" },
+                  {
+                    name: "createdAt",
+                    label: "Created at Date",
+                    sortable: "y",
+                  },
                   {
                     name: "subscriptionAmount",
                     label: "Subscription Amount",
@@ -443,101 +449,18 @@ function App() {
     const dataFormattedForTable = {
       headings: {
         batchHeadings: [
-          { name: "contractAddress", label: "Recipient", sortable: "y" },
-          { name: "processedForDate", label: "Date", sortable: "y" },
           { name: "transaction", label: "Id", sortable: "y" },
+          { name: "processedForDate", label: "Date", sortable: "y" },
+          { name: "contractAddress", label: "Recipient", sortable: "y" },
         ],
       },
       batchData: batchArray,
     };
-    console.log(dataFormattedForTable);
+    console.log("DATAFORMATTEDFORTABLE", dataFormattedForTable);
     return dataFormattedForTable;
   };
 
-  //3
-  const formatSuccessfulPayments = (transaction: any) => {
-    //formats 'processedForDate' value
-    let formattedProcessedForDate = formatDateTimeFromSeconds(
-      Number(transaction.processedForDate)
-    );
-
-    return {
-      id: Math.floor(Math.random() * 1000000000),
-      values: [
-        {
-          label: `transaction`,
-          value: transaction.transaction,
-        },
-        {
-          label: `contractAddress`,
-          value: transaction.contractAddress,
-        },
-        {
-          label: `processor`,
-          value: transaction.processor,
-        },
-        {
-          label: `accountProcessed`,
-          value: transaction.accountProcessed,
-        },
-        {
-          label: `processedForDate`,
-          value: formattedProcessedForDate,
-        },
-        {
-          label: `feeAmount`,
-          value: transaction.feeAmount,
-        },
-        {
-          label: `netAmount`,
-          value: transaction.netAmount,
-        },
-        {
-          label: `paymentToken`,
-          value: transaction.paymentToken,
-        },
-      ],
-    };
-  };
-
-  //4
-  const formatFailedPayments = (transaction: any) => {
-    //formats 'processedForDate' value
-    let formattedProcessedForDate = formatDateTimeFromSeconds(
-      Number(transaction.processedForDate)
-    );
-
-    return {
-      id: Math.floor(Math.random() * 1000000000),
-      values: [
-        {
-          label: `transaction`,
-          value: transaction.transaction,
-        },
-        {
-          label: `contractAddress`,
-          value: transaction.contractAddress,
-        },
-        {
-          label: `processor`,
-          value: transaction.processor,
-        },
-        {
-          label: `accountProcessed`,
-          value: transaction.accountProcessed,
-        },
-        {
-          label: `token`,
-          value: formattedProcessedForDate,
-        },
-        {
-          label: `reason`,
-          value: transaction.feeAmount,
-        },
-      ],
-    };
-  };
-
+  //hard-coded processors array
   const processors: string[] = [
     "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e",
     "0x71c56de65f9c0462103c35cc4f64b160a58a9227",
@@ -545,6 +468,7 @@ function App() {
     "0x0000000000000000000000000000000000000000",
   ];
 
+  //hard-coded network urls
   const networkURLs: NetworkInfo[] = [
     {
       name: "Polygon",
@@ -557,7 +481,7 @@ function App() {
   ];
 
   return (
-    <div>
+    <div className="app-container">
       <div>Select bot</div>
       <DropdownProcessors processors={processors} setProcessor={setProcessor} />
       <div>Select Network</div>
