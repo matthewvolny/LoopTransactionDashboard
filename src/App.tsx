@@ -3,8 +3,8 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { Payments, NetworkInfo } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { shortenHash } from "./utils/shortenHash";
+import { CollapsibleTable } from "./components/CollapsibleTable";
 import { Table } from "./components/Table";
-import { AccordionTable } from "./components/AccordionTable";
 import { DropdownProcessors } from "./components/DropdownProcessors";
 import { DropdownNetworks } from "./components/DropdownNetworks";
 import { PaymentTypeSelector } from "./components/PaymentTypeSelector";
@@ -449,14 +449,14 @@ function App() {
     const dataFormattedForTable = {
       headings: {
         batchHeadings: [
-          { name: "transaction", label: "Id", sortable: "y" },
-          { name: "processedForDate", label: "Date", sortable: "y" },
-          { name: "contractAddress", label: "Recipient", sortable: "y" },
+          { name: "transaction", label: "Transaction Hash", sortable: "y" },
+          { name: "processedForDate", label: "Date Processed", sortable: "y" },
+          { name: "contractAddress", label: "Contract Address", sortable: "y" },
         ],
       },
       batchData: batchArray,
     };
-    console.log("DATAFORMATTEDFORTABLE", dataFormattedForTable);
+    // console.log("DATAFORMATTEDFORTABLE", dataFormattedForTable);
     return dataFormattedForTable;
   };
 
@@ -486,7 +486,7 @@ function App() {
       <DropdownProcessors processors={processors} setProcessor={setProcessor} />
       <div>Select Network</div>
       <DropdownNetworks networkURLs={networkURLs} setNetwork={setNetwork} />
-      <AccordionTable data={payments} />
+      <CollapsibleTable payments={payments} />
     </div>
   );
 }
