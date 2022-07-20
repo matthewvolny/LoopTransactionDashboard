@@ -3,6 +3,7 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { Payments, NetworkInfo } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { shortenHash } from "./utils/shortenHash";
+import { formatSecondsToHrsMinsSecs } from "./utils/secondsToHrsMinsSecs";
 import { CollapsibleTable } from "./components/CollapsibleTable";
 import { Table } from "./components/Table";
 import { DropdownProcessors } from "./components/DropdownProcessors";
@@ -62,7 +63,7 @@ function App() {
     frequency    
     endDate
     lastPaymentDate
-    paymentToken
+    paymentTokenSymbol
     subscriptionAmount
   }
   }
@@ -95,6 +96,7 @@ function App() {
 
   //adds subscription data properties to successful and failed payments - used a 'lookup table
   const addSubscriptionDataToPayments = (data: any) => {
+    console.log("DATADATADATA: ", data);
     const subscriptions = {};
 
     data.subscriptionDetails.forEach((subscription: any) => {
@@ -117,7 +119,7 @@ function App() {
             frequency,
             endDate,
             lastPaymentDate,
-            paymentToken,
+            paymentTokenSymbol,
             subscriptionAmount,
             //@ts-ignore
           } = subscriptions[subscriptionIdentifier];
@@ -127,7 +129,7 @@ function App() {
             frequency,
             endDate,
             lastPaymentDate,
-            paymentToken,
+            paymentTokenSymbol,
             subscriptionAmount,
           };
         }
@@ -148,7 +150,7 @@ function App() {
             frequency,
             endDate,
             lastPaymentDate,
-            paymentToken,
+            paymentTokenSymbol,
             subscriptionAmount,
             //@ts-ignore
           } = subscriptions[subscriptionIdentifier];
@@ -158,7 +160,7 @@ function App() {
             frequency,
             endDate,
             lastPaymentDate,
-            paymentToken,
+            paymentTokenSymbol,
             subscriptionAmount,
           };
         }
@@ -254,7 +256,7 @@ function App() {
             frequency,
             lastPaymentDate,
             netAmount,
-            paymentToken,
+            paymentTokenSymbol,
             processor,
             startDate,
             subscriptionAmount,
@@ -265,35 +267,48 @@ function App() {
             return [
               {
                 name: "accountProcessed",
-                label: accountProcessed,
+                label: shortenHash(accountProcessed),
                 value: accountProcessed,
               },
-              { name: "endDate", label: endDate, value: endDate },
+              {
+                name: "endDate",
+                label: formatDateTimeFromSeconds(Number(endDate)),
+              },
               { name: "feeAmount", label: feeAmount, value: feeAmount },
               { name: "frequency", label: frequency, value: frequency },
               {
                 name: "lastPaymentDate",
-                label: lastPaymentDate,
+                label: formatDateTimeFromSeconds(Number(lastPaymentDate)),
                 value: lastPaymentDate,
               },
               { name: "netAmount", label: netAmount, value: netAmount },
               {
-                name: "paymentToken",
-                label: paymentToken,
-                value: paymentToken,
+                name: "paymentTokenSymbol",
+                label: paymentTokenSymbol,
+                value: paymentTokenSymbol,
               },
-              { name: "processor", label: processor, value: processor },
-              { name: "startDate", label: startDate, value: startDate },
+              // { name: "processor", label: processor, value: processor },
+              {
+                name: "startDate",
+                label: formatDateTimeFromSeconds(Number(startDate)),
+                value: startDate,
+              },
               {
                 name: "subscriptionAmount",
                 label: subscriptionAmount,
                 value: subscriptionAmount,
               },
-              { name: "transaction", label: transaction, value: transaction },
-              { name: "createdAt", label: createdAt, value: createdAt },
+              // { name: "transaction", label: transaction, value: transaction },
+              {
+                name: "createdAt",
+                label: formatDateTimeFromSeconds(Number(createdAt)),
+                value: createdAt,
+              },
               {
                 name: "timeTakenToProcessTransaction",
-                label: createdAt - processedForDate,
+                label: formatSecondsToHrsMinsSecs(
+                  Number(createdAt - processedForDate)
+                ),
                 value: createdAt - processedForDate,
               },
             ];
@@ -314,7 +329,8 @@ function App() {
           frequency,
           lastPaymentDate,
           netAmount,
-          token, //!called 'paymentToken' in 'successfulPayment'
+          // token, //!called 'paymentToken' in 'successfulPayment'
+          paymentTokenSymbol,
           processor,
           startDate,
           subscriptionAmount,
@@ -324,7 +340,7 @@ function App() {
           return [
             {
               name: "accountProcessed",
-              label: accountProcessed,
+              label: shortenHash(accountProcessed),
               value: accountProcessed,
             },
             { name: "endDate", label: endDate, value: endDate },
@@ -336,8 +352,12 @@ function App() {
               value: lastPaymentDate,
             },
             { name: "netAmount", label: netAmount, value: netAmount },
-            { name: "token", label: token, value: token }, //!called 'paymentToken' in 'successfulPayment'
-            { name: "processor", label: processor, value: processor },
+            {
+              name: "paymentTokenSymbol",
+              label: paymentTokenSymbol,
+              value: paymentTokenSymbol,
+            }, //!called 'paymentToken' in 'successfulPayment'
+            // { name: "processor", label: processor, value: processor },
             { name: "startDate", label: startDate, value: startDate },
             {
               name: "subscriptionAmount",
@@ -345,7 +365,7 @@ function App() {
               value: subscriptionAmount,
             },
             { name: "reason", label: reason, value: reason },
-            { name: "transaction", label: transaction, value: transaction },
+            // { name: "transaction", label: transaction, value: transaction },
           ];
         }
       );
@@ -359,7 +379,7 @@ function App() {
                 heading: [
                   {
                     name: "accountProcessed",
-                    label: "Subscriber Wallet",
+                    label: "Account Processed",
                     sortable: "y",
                   },
                   { name: "endDate", label: "End Date", sortable: "y" },
@@ -372,22 +392,22 @@ function App() {
                   },
                   { name: "netAmount", label: "Net Amount", sortable: "y" },
                   {
-                    name: "paymentToken",
-                    label: "paymentToken ",
+                    name: "paymentTokenSymbol",
+                    label: "paymentTokenSymbol",
                     sortable: "y",
                   },
-                  { name: "processor", label: "Processor", sortable: "y" },
+                  // { name: "processor", label: "Processor", sortable: "y" },
                   { name: "startDate", label: "Start Date", sortable: "y" },
                   {
                     name: "subscriptionAmount",
                     label: "Subscription Amount",
                     sortable: "y",
                   },
-                  {
-                    name: "transaction",
-                    label: "Transaction (matches batch Id)",
-                    sortable: "y",
-                  }, //!'transaction' not strictly needed here
+                  // {
+                  //   name: "transaction",
+                  //   label: "Transaction (matches batch Id)",
+                  //   sortable: "y",
+                  // }, //!'transaction' not strictly needed here
                   {
                     name: "createdAt",
                     label: "createdAt",
@@ -395,7 +415,7 @@ function App() {
                   },
                   {
                     name: "timeTakenToProcessTransaction",
-                    label: "timeTakenToProcessTransaction",
+                    label: "Time To Process Transaction",
                     sortable: "y",
                   },
                 ],
@@ -431,11 +451,11 @@ function App() {
                     sortable: "y",
                   },
                   { name: "reason", label: "Reason", sortable: "y" },
-                  {
-                    name: "transaction",
-                    label: "Transaction (matches batch Id)",
-                    sortable: "y",
-                  },
+                  // {
+                  //   name: "transaction",
+                  //   label: "Transaction (matches batch Id)",
+                  //   sortable: "y",
+                  // },
                 ],
                 paymentsArray: formattedFoundFailedTransactions,
               },
