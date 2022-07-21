@@ -73,6 +73,8 @@ export function CollapsibleTable({ payments }: any) {
   const batchHeadings = payments?.headings.batchHeadings;
   const batchData = payments?.batchData;
 
+  //state for column to 'orderBy', and whether to 'order' "asc" or "desc"
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
