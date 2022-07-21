@@ -108,11 +108,11 @@ function App() {
         let detailedPaymentData = addSubscriptionDataToPayments(data.data);
         console.log("detailedPaymentData", detailedPaymentData);
         let paymentBatches = createPaymentBatchesObject(detailedPaymentData);
-        console.log("paymentBatches", paymentBatches);
-        console.log(
-          "formatted for table",
-          formatPaymentsForTable(paymentBatches, detailedPaymentData)
-        );
+        //console.log("paymentBatches", paymentBatches);
+        // console.log(
+        //   "formatted for table",
+        //   formatPaymentsForTable(paymentBatches, detailedPaymentData)
+        // );
         setPayments(
           formatPaymentsForTable(paymentBatches, detailedPaymentData)
         );
@@ -124,66 +124,30 @@ function App() {
 
   //adds subscription data properties to successful and failed payments - used a 'lookup table
   const addSubscriptionDataToPayments = (data: any) => {
-    console.log("DATADATADATA: ", data);
-    const subscriptions = {};
+    const subscriptions: any = {};
 
     data.subscriptionDetails.forEach((subscription: any) => {
-      //@ts-ignore
       subscriptions[
         `${subscription.contractAddress}-${subscription.subscriber}`
       ] = subscription;
     });
 
-    const detailedSuccessfulPaymentsData = data.successfulPayments.map(
-      (payment: any) => {
+    const addSubscriptionDetailsToSuccessfulAndFailedPayments = (
+      paymentsArray: any,
+      subscriptions: any
+    ) => {
+      return paymentsArray.map((payment: any) => {
         let subscriptionIdentifier = `${payment.contractAddress}-${payment.accountProcessed}`;
-        //@ts-ignore
-        if (subscriptions[subscriptionIdentifier]) {
-          //@ts-ignore
-          // console.log("FOUND:", subscriptions[subscriptionIdentifier]);
-          //@ts-ignore
-          const {
-            startDate,
-            frequency,
-            endDate,
-            lastPaymentDate,
-            paymentToken,
-            paymentTokenSymbol,
-            subscriptionAmount,
-            //@ts-ignore
-          } = subscriptions[subscriptionIdentifier];
-          return {
-            ...payment,
-            startDate,
-            frequency,
-            endDate,
-            lastPaymentDate,
-            paymentToken,
-            paymentTokenSymbol,
-            subscriptionAmount,
-          };
-        }
-      }
-    );
-    // console.log("DETAILED: ", detailedSuccessfulPaymentsData);
 
-    const detailedFailedPaymentsData = data.failedPayments.map(
-      (payment: any) => {
-        let subscriptionIdentifier = `${payment.contractAddress}-${payment.accountProcessed}`;
-        //@ts-ignore
         if (subscriptions[subscriptionIdentifier]) {
-          //@ts-ignore
-          //console.log("FOUNDFAILED:", subscriptions[subscriptionIdentifier]);
-          //@ts-ignore
           const {
             startDate,
             frequency,
             endDate,
             lastPaymentDate,
-            token,
+            paymentToken,
             paymentTokenSymbol,
             subscriptionAmount,
-            //@ts-ignore
           } = subscriptions[subscriptionIdentifier];
           return {
             ...payment,
@@ -191,14 +155,26 @@ function App() {
             frequency,
             endDate,
             lastPaymentDate,
-            token,
+            paymentToken,
             paymentTokenSymbol,
             subscriptionAmount,
           };
+        } else {
+          return payment;
         }
-      }
-    );
-    // console.log("DETAILEDFAILED: ", detailedFailedPaymentsData);
+      });
+    };
+
+    const detailedSuccessfulPaymentsData =
+      addSubscriptionDetailsToSuccessfulAndFailedPayments(
+        data.successfulPayments,
+        subscriptions
+      );
+    const detailedFailedPaymentsData =
+      addSubscriptionDetailsToSuccessfulAndFailedPayments(
+        data.failedPayments,
+        subscriptions
+      );
 
     return {
       successfulPayments: detailedSuccessfulPaymentsData,
@@ -209,8 +185,6 @@ function App() {
   //!get advice on refactoring this function
   //create payment batches object
   const createPaymentBatchesObject = (detailedPaymentData: any) => {
-    //for each unique batchID push batch info to array(with just "id", "date", "recipient")
-
     //build transaction batches array (has failed and successful batches)
     let batches: any = [];
 
@@ -219,39 +193,17 @@ function App() {
     };
 
     let batchCount: Obj = {};
-    //create successful batches array
-    const addSuccessfulBatchesToArray = (successfulPayments: any) => {
-      successfulPayments.forEach((payment: any) => {
+
+    const addBatchesToArray = (payments: any) => {
+      payments.forEach((payment: any) => {
         let batchId = payment.transaction;
         if (!batchCount.batchId) {
           batchCount[batchId] = 1;
           batches.push({
             transaction: { label: shortenHash(batchId), value: batchId },
-            processedForDate: {
-              label: formatDateTimeFromSeconds(
-                Number(payment.processedForDate)
-              ),
-              value: payment.processedForDate,
-            },
-            contractAddress: {
-              label: payment.contractAddress,
-              value: payment.contractAddress,
-            },
-          });
-        }
-      });
-    };
-    //create failed batches array
-    const addFailedBatchesToArray = (failedPayments: any) => {
-      failedPayments.forEach((payment: any) => {
-        let batchId = payment.transaction;
-        if (!batchCount.batchId) {
-          batchCount[batchId] = 1;
-          batches.push({
-            transaction: { label: batchId, value: batchId },
             createdAt: {
-              label: formatDateTimeFromSeconds(Number(payment.createdAt)), //!this is distinct for failed batches
-              value: payment.createdAt, //!this is distinct for failed batches
+              label: formatDateTimeFromSeconds(Number(payment.createdAt)),
+              value: payment.createdAt,
             },
             contractAddress: {
               label: payment.contractAddress,
@@ -262,8 +214,8 @@ function App() {
       });
     };
 
-    addSuccessfulBatchesToArray(detailedPaymentData.successfulPayments);
-    addFailedBatchesToArray(detailedPaymentData.failedPayments);
+    addBatchesToArray(detailedPaymentData.successfulPayments);
+    addBatchesToArray(detailedPaymentData.failedPayments);
 
     return batches;
   };
@@ -363,9 +315,9 @@ function App() {
               },
               // { name: "transaction", label: transaction, value: transaction },
               {
-                name: "createdAt",
-                label: formatDateTimeFromSeconds(Number(createdAt)),
-                value: createdAt,
+                name: "processedForDate",
+                label: formatDateTimeFromSeconds(Number(processedForDate)),
+                value: processedForDate,
               },
               {
                 name: "timeTakenToProcessTransaction",
@@ -476,8 +428,8 @@ function App() {
                   //   sortable: "y",
                   // }, //!'transaction' not strictly needed here
                   {
-                    name: "createdAt",
-                    label: "createdAt",
+                    name: "processedForDate",
+                    label: "Processed For Date",
                     sortable: "y",
                   },
                   {
@@ -507,6 +459,7 @@ function App() {
                   { name: "token", label: "Token ", sortable: "y" }, //!called 'paymentToken' in 'successfulPayment'
                   { name: "processor", label: "Processor", sortable: "y" },
                   { name: "startDate", label: "Start Date", sortable: "y" },
+                  // likely remove next line
                   {
                     name: "createdAt",
                     label: "Created at Date",
@@ -537,7 +490,8 @@ function App() {
       headings: {
         batchHeadings: [
           { name: "transaction", label: "Transaction Hash", sortable: "y" },
-          { name: "processedForDate", label: "Date Processed", sortable: "y" },
+          // { name: "processedForDate", label: "Date Processed", sortable: "y" },
+          { name: "createdAt", label: "Created At", sortable: "y" },
           { name: "contractAddress", label: "Contract Address", sortable: "y" },
         ],
       },
