@@ -1,22 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
-import { Payments, NetworkInfo } from "./models";
+import { NetworkInfo } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { shortenHash } from "./utils/shortenHash";
 import { formatSecondsToHrsMinsSecs } from "./utils/secondsToHrsMinsSecs";
 import { convertFromSeconds } from "./utils/convertFromSeconds";
 import { divideByTokenDecimalPlaces } from "./utils/divideByTokenDecimalPlaces";
 import { CollapsibleTable } from "./components/CollapsibleTable";
-import { Table } from "./components/Table";
 import { DropdownProcessors } from "./components/DropdownProcessors";
 import { DropdownNetworks } from "./components/DropdownNetworks";
-import { PaymentTypeSelector } from "./components/PaymentTypeSelector";
 import "./App.css";
 
-//!for getting specific tokenid for contract address:
-//!1)loop through all account addresses, push each unique address to object(as key)
-//!2)make fetch requests for each key, tokenId is value for key(address).
-//!3)loop through all account addresses adding appropriate tokenId
+//hard-coded processors array
+const processors: string[] = [
+  "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e",
+  "0x71c56de65f9c0462103c35cc4f64b160a58a9227",
+  "0xb7443f7a2333497c7cdca1747a32a9b49160ac11",
+  "0x0000000000000000000000000000000000000000",
+];
+
+//hard-coded network urls
+const networkURLs: NetworkInfo[] = [
+  {
+    name: "Polygon",
+    url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon",
+  },
+  {
+    name: "Rinkeby",
+    url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-rinkeby",
+  },
+];
+
+//hard-coded token decimal places reference
+const tokenDecimalsReference: any = {
+  Rinkeby: { "0xeb8f08a975ab53e34d8a0330e0d34de942c95926": 6 }, //USDC
+  Polygon: {
+    "0x45c32fa6df82ead1e2ef74d17b76547eddfaff89": 18, //FRAX
+    "0x2791bca1f2de4661ed88a30c99a7a9449aa84174": 6, //USDC
+    "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619": 18, //WETH
+    "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063": 18, //DAI
+    "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6": 8, //"WBTC"
+  },
+};
 
 function App() {
   const [payments, setPayments] = useState<any>();
@@ -520,38 +545,6 @@ function App() {
     };
     // console.log("DATAFORMATTEDFORTABLE", dataFormattedForTable);
     return dataFormattedForTable;
-  };
-
-  //hard-coded processors array
-  const processors: string[] = [
-    "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e",
-    "0x71c56de65f9c0462103c35cc4f64b160a58a9227",
-    "0xb7443f7a2333497c7cdca1747a32a9b49160ac11",
-    "0x0000000000000000000000000000000000000000",
-  ];
-
-  //hard-coded network urls
-  const networkURLs: NetworkInfo[] = [
-    {
-      name: "Polygon",
-      url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon",
-    },
-    {
-      name: "Rinkeby",
-      url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-rinkeby",
-    },
-  ];
-
-  //! if token address matches one of these return token decimal places
-  const tokenDecimalsReference: any = {
-    Rinkeby: { "0xeb8f08a975ab53e34d8a0330e0d34de942c95926": 6 }, //USDC
-    Polygon: {
-      "0x45c32fa6df82ead1e2ef74d17b76547eddfaff89": 18, //FRAX
-      "0x2791bca1f2de4661ed88a30c99a7a9449aa84174": 6, //USDC
-      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619": 18, //WETH
-      "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063": 18, //DAI
-      "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6": 8, //"WBTC"
-    },
   };
 
   return (

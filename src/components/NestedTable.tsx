@@ -1,43 +1,42 @@
 import React from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 
-interface NestedTableProps {
-  data: any;
-  selected: string;
-  setSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
-}
-
-export const NestedTable = ({ data, selected, setSelected }: any) => {
-  // console.log("INNESTEDTABLE");
-  // console.log(data);
-  // console.log(data?.heading);
-  //map these payments I
-  // console.log(data?.payments);
-  //inside of each there a transactionId and paymentsArray
-
+export const NestedTable = ({ payments }: any) => {
   return (
-    <div>
-      <table className="table">
-        <thead>
-          <tr>
-            {data?.heading.map((item: any) => {
-              return (
-                <th key={Math.floor(Math.random() * 1000000)}>{item.label}</th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {data?.paymentsArray.map((payment: any) => {
+    <Table size="small" aria-label="purchases">
+      <TableHead>
+        <TableRow>
+          {payments?.heading.map((item: any) => {
             return (
-              <tr key={Math.floor(Math.random() * 1000000)}>
-                {payment.map((value: any) => {
-                  return <td>{value.label}</td>;
-                })}
-              </tr>
+              <TableCell
+                align="right"
+                key={Math.floor(Math.random() * 1000000)}
+              >
+                {item.label}
+              </TableCell>
             );
           })}
-        </tbody>
-      </table>
-    </div>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {payments?.paymentsArray.map((payment: any) => {
+          return (
+            <TableRow key={Math.floor(Math.random() * 1000000)}>
+              {payment.map((value: any) => {
+                return (
+                  <TableCell scope="row" align="right">
+                    {value.label}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 };

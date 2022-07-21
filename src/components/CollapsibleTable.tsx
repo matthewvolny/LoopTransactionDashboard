@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { NestedTable1 } from "./NestedTable1";
+import { NestedTable } from "./NestedTable";
 
 function Row(props: { row: any }) {
   const { row } = props;
@@ -50,13 +50,13 @@ function Row(props: { row: any }) {
               <Typography variant="h6" gutterBottom component="div">
                 Successful Payments
               </Typography>
-              <NestedTable1 payments={row?.payments.successfulPayments} />
+              <NestedTable payments={row?.payments.successfulPayments} />
               {row?.payments.failedPayments.paymentsArray.length > 0 ? (
                 <>
                   <Typography variant="h6" gutterBottom component="div">
                     Failed Payments
                   </Typography>
-                  <NestedTable1 payments={row?.payments.failedPayments} />
+                  <NestedTable payments={row?.payments.failedPayments} />
                 </>
               ) : (
                 <></>
