@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
-import { NetworkInfo } from "./models";
+import { NetworkInfo, Obj } from "./models";
 import { formatDateTimeFromSeconds } from "./utils/dateTimeConverison";
 import { shortenHash } from "./utils/shortenHash";
 import { formatSecondsToHrsMinsSecs } from "./utils/secondsToHrsMinsSecs";
@@ -106,7 +106,7 @@ function App() {
       })
       .then((data) => {
         let detailedPaymentData = addSubscriptionDataToPayments(data.data);
-        console.log("detailedPaymentData", detailedPaymentData);
+        //console.log("detailedPaymentData", detailedPaymentData);
         let paymentBatches = createPaymentBatchesObject(detailedPaymentData);
         //console.log("paymentBatches", paymentBatches);
         // console.log(
@@ -182,16 +182,9 @@ function App() {
     };
   };
 
-  //!get advice on refactoring this function
-  //create payment batches object
+  //create payment batches array (includes batches with successful and failed payments)
   const createPaymentBatchesObject = (detailedPaymentData: any) => {
-    //build transaction batches array (has failed and successful batches)
     let batches: any = [];
-
-    type Obj = {
-      [key: string]: number;
-    };
-
     let batchCount: Obj = {};
 
     const addBatchesToArray = (payments: any) => {
@@ -220,11 +213,11 @@ function App() {
     return batches;
   };
 
-  //3)map batches, and look for matches in all transactions that match the batchId (transaction)
+  //map batches, grouping transactions that match the (transaction id - 'batch id')
   // when transaction found matching batchId, add it to 'transactioninfoarray', and at last iteration, add transactionInfoArray to batch object.
   const formatPaymentsForTable = (batches: any, detailedPaymentData: any) => {
     let batchArray = batches.map((batch: any) => {
-      //find successful transactions for a given batchId
+      //array of successful transactions for the given batchId
       const foundSuccessfulTransactions =
         detailedPaymentData.successfulPayments.filter(
           ({ transaction }: any) => batch.transaction.value === transaction
@@ -242,10 +235,8 @@ function App() {
             netAmount,
             paymentToken,
             paymentTokenSymbol,
-            processor,
             startDate,
             subscriptionAmount,
-            transaction,
             createdAt,
             processedForDate,
           }: any) => {
@@ -296,7 +287,6 @@ function App() {
                 label: paymentTokenSymbol,
                 value: paymentTokenSymbol,
               },
-              // { name: "processor", label: processor, value: processor },
               {
                 name: "startDate",
                 label: formatDateTimeFromSeconds(Number(startDate)),
@@ -313,7 +303,6 @@ function App() {
                 ),
                 value: subscriptionAmount,
               },
-              // { name: "transaction", label: transaction, value: transaction },
               {
                 name: "processedForDate",
                 label: formatDateTimeFromSeconds(Number(processedForDate)),
@@ -340,17 +329,13 @@ function App() {
         ({
           accountProcessed,
           endDate,
-          feeAmount,
           frequency,
           lastPaymentDate,
-          netAmount,
-          token, //!called 'paymentToken' in 'successfulPayment'
+          token, //!called 'paymentToken' in 'successfulPayment' //use like paymentToken
           paymentTokenSymbol,
-          processor,
           startDate,
           subscriptionAmount,
           reason,
-          transaction,
         }: any) => {
           return [
             {
@@ -358,8 +343,11 @@ function App() {
               label: shortenHash(accountProcessed),
               value: accountProcessed,
             },
-            { name: "endDate", label: endDate, value: endDate },
-            { name: "feeAmount", label: feeAmount, value: feeAmount },
+            {
+              name: "endDate",
+              label: formatDateTimeFromSeconds(Number(endDate)), //throwing error because value = 0
+              value: endDate,
+            },
             {
               name: "frequency",
               label: convertFromSeconds(frequency),
@@ -367,23 +355,35 @@ function App() {
             },
             {
               name: "lastPaymentDate",
-              label: lastPaymentDate,
+              label: formatDateTimeFromSeconds(Number(lastPaymentDate)),
               value: lastPaymentDate,
             },
-            { name: "netAmount", label: netAmount, value: netAmount },
             {
               name: "paymentTokenSymbol",
               label: paymentTokenSymbol,
               value: paymentTokenSymbol,
             }, //!called 'paymentToken' in 'successfulPayment'
-            // { name: "processor", label: processor, value: processor },
-            { name: "startDate", label: startDate, value: startDate },
+            {
+              name: "startDate",
+              label: formatDateTimeFromSeconds(Number(startDate)),
+              value: startDate,
+            },
             {
               name: "subscriptionAmount",
-              label: subscriptionAmount,
+              label: divideByTokenDecimalPlaces(
+                Number(subscriptionAmount),
+                token,
+                networkURLs,
+                tokenDecimalsReference,
+                network
+              ),
               value: subscriptionAmount,
             },
-            { name: "reason", label: reason, value: reason },
+            {
+              name: "reason",
+              label: shortenHash(reason),
+              value: reason,
+            },
             // { name: "transaction", label: transaction, value: transaction },
           ];
         }
@@ -412,7 +412,7 @@ function App() {
                   { name: "netAmount", label: "Net Amount", sortable: "y" },
                   {
                     name: "paymentTokenSymbol",
-                    label: "paymentTokenSymbol",
+                    label: "Payment Token Symbol",
                     sortable: "y",
                   },
                   // { name: "processor", label: "Processor", sortable: "y" },
@@ -444,38 +444,28 @@ function App() {
                 heading: [
                   {
                     name: "accountProcessed",
-                    label: "Subscriber Wallet",
+                    label: "Account Processed",
                     sortable: "y",
                   },
                   { name: "endDate", label: "End Date", sortable: "y" },
-                  { name: "feeAmount", label: "Fee", sortable: "y" },
                   { name: "frequency", label: "Frequency", sortable: "y" },
                   {
                     name: "lastPaymentDate",
                     label: "Last Payment Date",
                     sortable: "y",
                   },
-                  { name: "netAmount", label: "Net Amount", sortable: "y" },
-                  { name: "token", label: "Token ", sortable: "y" }, //!called 'paymentToken' in 'successfulPayment'
-                  { name: "processor", label: "Processor", sortable: "y" },
-                  { name: "startDate", label: "Start Date", sortable: "y" },
-                  // likely remove next line
                   {
-                    name: "createdAt",
-                    label: "Created at Date",
+                    name: "token",
+                    label: "Payment Token Symbol",
                     sortable: "y",
-                  },
+                  }, //!called 'paymentToken' in 'successfulPayment'
+                  { name: "startDate", label: "Start Date", sortable: "y" },
                   {
                     name: "subscriptionAmount",
                     label: "Subscription Amount",
                     sortable: "y",
                   },
                   { name: "reason", label: "Reason", sortable: "y" },
-                  // {
-                  //   name: "transaction",
-                  //   label: "Transaction (matches batch Id)",
-                  //   sortable: "y",
-                  // },
                 ],
                 paymentsArray: formattedFoundFailedTransactions,
               },

@@ -1,3 +1,7 @@
+export type Obj = {
+  [key: string]: number;
+};
+
 export type Heading = {
   label: string;
   sortable: boolean;
