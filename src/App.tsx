@@ -54,6 +54,8 @@ function App() {
 
   //1
   useEffect(() => {
+    console.log("processor: ", processor);
+    console.log("network: ", network);
     fetchPaymentInfo(processor, network);
   }, [processor, network]);
 
@@ -184,13 +186,15 @@ function App() {
 
   //create payment batches array (includes batches with successful and failed payments)
   const createPaymentBatchesObject = (detailedPaymentData: any) => {
+    console.log("detailedpaymentData:", detailedPaymentData);
+
     let batches: any = [];
     let batchCount: Obj = {};
 
     const addBatchesToArray = (payments: any) => {
       payments.forEach((payment: any) => {
         let batchId = payment.transaction;
-        if (!batchCount.batchId) {
+        if (!batchCount[batchId]) {
           batchCount[batchId] = 1;
           batches.push({
             transaction: { label: shortenHash(batchId), value: batchId },
@@ -210,6 +214,7 @@ function App() {
     addBatchesToArray(detailedPaymentData.successfulPayments);
     addBatchesToArray(detailedPaymentData.failedPayments);
 
+    console.log("batches", batches);
     return batches;
   };
 
