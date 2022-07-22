@@ -31,16 +31,15 @@ function Row(props: { row: any }) {
           </IconButton>
         </TableCell>
 
-        <TableCell scope="row" align="right">
+        <TableCell sx={{ letterSpacing: "0.04rem" }} scope="row" align="right">
           {row.transaction.label}
         </TableCell>
-        {/* line needed for batches from failed payments (maybe change to simple createdAt date?) */}
-        {row.processedForDate ? (
-          <TableCell align="right">{row.processedForDate.label}</TableCell>
-        ) : (
-          <TableCell align="right">{row.createdAt.label}</TableCell>
-        )}
-        <TableCell align="right">{row.contractAddress.label}</TableCell>
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.createdAt.label}
+        </TableCell>
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.contractAddress.label}
+        </TableCell>
       </TableRow>
       {/* this could likely be put in another component */}
       <TableRow>
@@ -49,7 +48,12 @@ function Row(props: { row: any }) {
             <Box sx={{ margin: 1 }}>
               {row?.payments.successfulPayments.paymentsArray.length > 0 ? (
                 <>
-                  <Typography variant="h6" gutterBottom component="div">
+                  <Typography
+                    sx={{ letterSpacing: "0.04rem" }}
+                    variant="h6"
+                    gutterBottom
+                    component="div"
+                  >
                     Successful Payments
                   </Typography>
                   <NestedTable payments={row?.payments.successfulPayments} />
@@ -59,7 +63,12 @@ function Row(props: { row: any }) {
               )}
               {row?.payments.failedPayments.paymentsArray.length > 0 ? (
                 <>
-                  <Typography variant="h6" gutterBottom component="div">
+                  <Typography
+                    sx={{ letterSpacing: "0.04rem" }}
+                    variant="h6"
+                    gutterBottom
+                    component="div"
+                  >
                     Failed Payments
                   </Typography>
                   <NestedTable payments={row?.payments.failedPayments} />
@@ -89,7 +98,11 @@ export function CollapsibleTable({ payments }: any) {
             <TableCell />
             {batchHeadings?.map((heading: any) => {
               return (
-                <TableCell key={Math.floor(Math.random() * 1000000)}>
+                <TableCell
+                  align="right"
+                  sx={{ fontWeight: "600", letterSpacing: "0.04rem" }}
+                  key={Math.floor(Math.random() * 1000000)}
+                >
                   {heading.label}
                 </TableCell>
               );

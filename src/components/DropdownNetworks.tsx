@@ -26,10 +26,15 @@ export const DropdownNetworks = ({
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <Select value={network} onChange={handleChange}>
+        <Select
+          sx={{ letterSpacing: "0.04rem" }}
+          value={network}
+          onChange={handleChange}
+        >
           {networkURLs.map((network) => {
             return (
               <MenuItem
+                sx={{ letterSpacing: "0.04rem" }}
                 value={network.url}
                 key={Math.floor(Math.random() * 1000000)}
               >

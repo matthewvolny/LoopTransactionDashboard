@@ -197,7 +197,7 @@ function App() {
         if (!batchCount[batchId]) {
           batchCount[batchId] = 1;
           batches.push({
-            transaction: { label: shortenHash(batchId), value: batchId },
+            transaction: { label: batchId, value: batchId },
             createdAt: {
               label: formatDateTimeFromSeconds(Number(payment.createdAt)),
               value: payment.createdAt,
@@ -477,7 +477,7 @@ function App() {
         batchHeadings: [
           { name: "transaction", label: "Transaction Hash", sortable: "y" },
           // { name: "processedForDate", label: "Date Processed", sortable: "y" },
-          { name: "createdAt", label: "Created At", sortable: "y" },
+          { name: "createdAt", label: "Date (Block Timestamp)", sortable: "y" },
           { name: "contractAddress", label: "Contract Address", sortable: "y" },
         ],
       },
