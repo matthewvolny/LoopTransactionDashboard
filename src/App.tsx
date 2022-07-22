@@ -491,7 +491,11 @@ function App() {
         setProcessor={setProcessor}
       />
       <div>Select Network</div>
-      <DropdownNetworks networkURLs={networkURLs} setNetwork={setNetwork} />
+      <DropdownNetworks
+        networkURLs={networkURLs}
+        network={network}
+        setNetwork={setNetwork}
+      />
       <CollapsibleTable payments={payments} />
     </div>
   );
