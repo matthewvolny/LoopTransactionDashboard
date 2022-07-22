@@ -25,10 +25,18 @@ export const DropdownProcessors = ({
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <Select value={processor} onChange={handleChange}>
+        <Select
+          sx={{ letterSpacing: "0.04rem" }}
+          value={processor}
+          onChange={handleChange}
+        >
           {processors.map((processor) => {
             return (
-              <MenuItem key={processor} value={processor}>
+              <MenuItem
+                sx={{ letterSpacing: "0.04rem" }}
+                key={processor}
+                value={processor}
+              >
                 {processor}
               </MenuItem>
             );

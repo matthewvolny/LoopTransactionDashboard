@@ -489,13 +489,13 @@ function App() {
 
   return (
     <div className="app-container">
-      <div>Select bot</div>
+      <div className="first-dropdown-label">Select Processor</div>
       <DropdownProcessors
         processors={processors}
         processor={processor}
         setProcessor={setProcessor}
       />
-      <div>Select Network</div>
+      <div className="second-dropdown-label">Select Network</div>
       <DropdownNetworks
         networkURLs={networkURLs}
         network={network}

@@ -82,7 +82,7 @@ export function CollapsibleTable({ payments }: any) {
   //state for column to 'orderBy', and whether to 'order' "asc" or "desc"
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ marginTop: "2rem" }}>
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>

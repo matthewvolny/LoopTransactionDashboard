@@ -2,22 +2,31 @@
   font-size: 1rem;
 }
 * + * {
-  margin-top: 0.5rem;
+  margin-top: 1.3rem;
 }
 
 .app-container {
-  /* display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 1rem; */
   width: 90%;
-  margin: 0 auto;
+  margin: 3rem auto;
 }
 
-.payments-label {
-  color: purple;
-  margin: 1.5rem 0rem;
+.first-dropdown-label,
+.second-dropdown-label {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.04rem;
 }
+
+/* MUI dropdown selector */
+.css-1poimk-MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper {
+  margin-top: 0rem !important;
+}
+
+/* MUI dropdown selector arrow icon */
+.MuiSvgIcon-root {
+  margin-top: 0rem !important;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -51,12 +60,4 @@ form td:last-child {
 
 form * {
   font-size: 28px;
-}
-
-.hidden {
-  display: none;
-}
-
-#visible {
-  display: contents;
 }
