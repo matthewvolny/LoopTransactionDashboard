@@ -1,40 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import {
+  Box,
+  Select,
+  FormControl,
+  MenuItem,
+  SelectChangeEvent,
+} from "@mui/material";
 
 interface DropdownProps {
   processors: string[];
+  processor: string;
   setProcessor: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const DropdownProcessors = ({
   processors,
+  processor,
   setProcessor,
 }: DropdownProps) => {
-  const [selectedOption, setSelectedOption] = useState<string>(
-    "0xcbda2f4d091331c5ca4c91ebbf5bd51162edd73e"
-  );
-
-  const handleChange = (e: string) => {
-    setSelectedOption(e);
+  const handleChange = (event: SelectChangeEvent) => {
+    setProcessor(event.target.value as string);
   };
 
-  useEffect(() => {
-    setProcessor(selectedOption);
-  }, [selectedOption]);
-
   return (
-    <div>
-      <select
-        onChange={(e) => handleChange(e.target.value)}
-        value={selectedOption}
-      >
-        {processors.map((processor) => {
-          return (
-            <option key={Math.floor(Math.random() * 1000000)}>
-              {processor}
-            </option>
-          );
-        })}
-      </select>
-    </div>
+    <Box sx={{ minWidth: 120 }}>
+      <FormControl fullWidth>
+        <Select value={processor} onChange={handleChange}>
+          {processors.map((processor) => {
+            return (
+              <MenuItem key={processor} value={processor}>
+                {processor}
+              </MenuItem>
+            );
+          })}
+        </Select>
+      </FormControl>
+    </Box>
   );
 };

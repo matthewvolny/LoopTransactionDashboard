@@ -222,7 +222,6 @@ function App() {
         detailedPaymentData.successfulPayments.filter(
           ({ transaction }: any) => batch.transaction.value === transaction
         );
-      // console.log("foundSuccessfulTransactions", foundSuccessfulTransactions);
 
       const formattedFoundSuccessfulTransactions =
         foundSuccessfulTransactions.map(
@@ -323,7 +322,6 @@ function App() {
       const foundFailedTransactions = detailedPaymentData.failedPayments.filter(
         ({ transaction }: any) => batch.transaction.value === transaction
       );
-      // console.log("foundFailedTransactions", foundFailedTransactions);
 
       const formattedFoundFailedTransactions = foundFailedTransactions.map(
         ({
@@ -362,7 +360,7 @@ function App() {
               name: "paymentTokenSymbol",
               label: paymentTokenSymbol,
               value: paymentTokenSymbol,
-            }, //!called 'paymentToken' in 'successfulPayment'
+            },
             {
               name: "startDate",
               label: formatDateTimeFromSeconds(Number(startDate)),
@@ -384,7 +382,6 @@ function App() {
               label: shortenHash(reason),
               value: reason,
             },
-            // { name: "transaction", label: transaction, value: transaction },
           ];
         }
       );
@@ -415,18 +412,12 @@ function App() {
                     label: "Payment Token Symbol",
                     sortable: "y",
                   },
-                  // { name: "processor", label: "Processor", sortable: "y" },
                   { name: "startDate", label: "Start Date", sortable: "y" },
                   {
                     name: "subscriptionAmount",
                     label: "Subscription Amount",
                     sortable: "y",
                   },
-                  // {
-                  //   name: "transaction",
-                  //   label: "Transaction (matches batch Id)",
-                  //   sortable: "y",
-                  // }, //!'transaction' not strictly needed here
                   {
                     name: "processedForDate",
                     label: "Processed For Date",
@@ -494,7 +485,11 @@ function App() {
   return (
     <div className="app-container">
       <div>Select bot</div>
-      <DropdownProcessors processors={processors} setProcessor={setProcessor} />
+      <DropdownProcessors
+        processors={processors}
+        processor={processor}
+        setProcessor={setProcessor}
+      />
       <div>Select Network</div>
       <DropdownNetworks networkURLs={networkURLs} setNetwork={setNetwork} />
       <CollapsibleTable payments={payments} />
