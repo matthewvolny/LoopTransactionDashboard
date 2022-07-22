@@ -28,7 +28,11 @@ export const NestedTable = ({ payments }: any) => {
             <TableRow key={Math.floor(Math.random() * 1000000)}>
               {payment.map((value: any) => {
                 return (
-                  <TableCell scope="row" align="right">
+                  <TableCell
+                    key={Math.floor(Math.random() * 1000000)}
+                    scope="row"
+                    align="right"
+                  >
                     {value.label}
                   </TableCell>
                 );
