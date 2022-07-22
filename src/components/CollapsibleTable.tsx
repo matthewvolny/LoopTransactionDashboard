@@ -21,7 +21,7 @@ function Row(props: { row: any }) {
   return (
     <React.Fragment>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-        <TableCell>
+        <TableCell align="center" sx={{ width: "3rem" }}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -45,7 +45,7 @@ function Row(props: { row: any }) {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
+            <Box sx={{ margin: 0, padding: 3, backgroundColor: "#f1eff1" }}>
               {row?.payments.successfulPayments.paymentsArray.length > 0 ? (
                 <>
                   <Typography
@@ -100,7 +100,11 @@ export function CollapsibleTable({ payments }: any) {
               return (
                 <TableCell
                   align="right"
-                  sx={{ fontWeight: "600", letterSpacing: "0.04rem" }}
+                  sx={{
+                    color: "white",
+                    fontWeight: "600",
+                    letterSpacing: "0.04rem",
+                  }}
                   key={Math.floor(Math.random() * 1000000)}
                 >
                   {heading.label}

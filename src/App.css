@@ -28,37 +28,57 @@
 }
 
 /* below here I have not checked out */
-table {
+/* table {
   border-collapse: collapse;
   width: 100%;
-}
+} */
 
 th,
 td {
   border: 1px solid #ffffff;
-  text-align: left;
+  /* text-align: left; */
   padding: 8px;
   font-size: 1rem;
 }
 
 th {
-  background-color: rgb(117, 201, 250);
+  background-color: #6065ec;
 }
 
-td {
+/* td {
   background-color: rgb(205, 235, 253);
 }
+td:hover {
+  background-color: red;
+} */
 
-form {
+.css-2blr9s-MuiTableRow-root:hover {
+  background-color: #f1eff1 !important;
+}
+
+.css-1q1u3t4-MuiTableRow-root:hover {
+  background-color: #f1eff1 !important;
+}
+
+tr {
+  background-color: white !important;
+}
+
+/* revealed nested table */
+.css-1ex1afd-MuiTableCell-root {
+  padding: 0 !important;
+}
+
+/* form {
   display: flex;
   gap: 5px;
-}
+} */
 
-form td:last-child {
+/* form td:last-child {
   display: flex;
   justify-content: space-evenly;
-}
+} */
 
-form * {
+/* form * {
   font-size: 28px;
-}
+} */
