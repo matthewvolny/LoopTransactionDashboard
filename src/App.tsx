@@ -52,12 +52,34 @@ function App() {
     "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon"
   );
 
-  // const fetchAlchemyBatchInfo = async (batchId: string) => {
+  const fetchAlchemyBatchInfo = async (batchId: string) => {
+    const { ethers } = require("ethers");
+    const apiKey = "YJ34MEc7XE8whdLnDPRKW1I8e14GGeuB";
+    const provider = new ethers.providers.AlchemyProvider("matic", apiKey);
+    // Query the blockchain (for a particular hash)
+    const receipt = await provider.getTransactionReceipt(batchId);
+    console.log("RECEIPT:", receipt);
+    console.log("RECEIPT:", Number(receipt.gasUsed._hex));
+    let alchemyGasData = {
+      gasUsed: Number(receipt.gasUsed._hex),
+      cumulativeGasUsed: Number(receipt.cumulativeGasUsed._hex),
+      //conversion from hex format + wei to gwei conversion
+      effectiveGasPrice: Number(receipt.effectiveGasPrice._hex) / 1000000000,
+    };
+    return alchemyGasData;
+  };
+
+  // const fetchAlchemyBatchInfo = async () => {
   //   const { ethers } = require("ethers");
   //   const apiKey = "YJ34MEc7XE8whdLnDPRKW1I8e14GGeuB";
   //   const provider = new ethers.providers.AlchemyProvider("matic", apiKey);
   //   // Query the blockchain (for a particular hash)
-  //   const receipt = await provider.getTransactionReceipt(batchId);
+  //   const receipt = await provider.getTransactionReceipt({
+  //     hash: [
+  //       "0x9c02ccc42d9bd0c026fa7e09a1ee97a2358cb0e9256aa61babc016ab3c163eb4",
+  //       "0xc8dc9c79be33532cb9ed1e4f6764616a4fac99fe3a0e44a7b7ed13796c2a1d76",
+  //     ],
+  //   });
   //   console.log("RECEIPT:", receipt);
   //   console.log("RECEIPT:", Number(receipt.gasUsed._hex));
   //   let alchemyGasData = {
@@ -67,6 +89,7 @@ function App() {
   //   };
   //   return alchemyGasData;
   // };
+  // fetchAlchemyBatchInfo();
 
   //1
   useEffect(() => {
@@ -210,10 +233,19 @@ function App() {
     let batchCount: Obj = {};
 
     const addBatchesToArray = async (payments: any) => {
+      //!can uncomment and use a "loading" symbol until values are ready
+      // for (const [index, payment] of payments.entries()) {
       for (const payment of payments) {
         // payments.forEach(async (payment: any) => {
         let batchId = payment.transaction;
-        // let alchemyGasData = await fetchAlchemyBatchInfo(batchId);
+        //!can uncomment and use a "loading" symbol until values are ready
+        // let alchemyGasData: any = null;
+        // if (index <= 1) {
+        //   alchemyGasData = await fetchAlchemyBatchInfo(batchId);
+        // }
+
+        let alchemyGasData = await fetchAlchemyBatchInfo(batchId);
+
         // console.log(
         //   "alchemygas data: ",
         //   alchemyGasData.gasUsed,
@@ -232,18 +264,18 @@ function App() {
               label: payment.contractAddress,
               value: payment.contractAddress,
             },
-            // gasUsed: {
-            //   label: alchemyGasData.gasUsed,
-            //   value: alchemyGasData.gasUsed,
-            // },
-            // cumulativeGasUsed: {
-            //   label: alchemyGasData.cumulativeGasUsed,
-            //   value: alchemyGasData.cumulativeGasUsed,
-            // },
-            // effectiveGasPrice: {
-            //   label: alchemyGasData.effectiveGasPrice,
-            //   value: alchemyGasData.effectiveGasPrice,
-            // },
+            gasUsed: {
+              label: alchemyGasData.gasUsed,
+              value: alchemyGasData.gasUsed,
+            },
+            cumulativeGasUsed: {
+              label: alchemyGasData.cumulativeGasUsed,
+              value: alchemyGasData.cumulativeGasUsed,
+            },
+            effectiveGasPrice: {
+              label: alchemyGasData.effectiveGasPrice,
+              value: alchemyGasData.effectiveGasPrice,
+            },
           });
         }
         // });
@@ -279,8 +311,8 @@ function App() {
         },
         0
       );
-      console.log(sumOfFees);
-      console.log(paymentToken);
+      // console.log(sumOfFees);
+      // console.log(paymentToken);
 
       let formattedSumOfFees = divideByTokenDecimalPlaces(
         Number(sumOfFees),
@@ -544,6 +576,18 @@ function App() {
           // { name: "processedForDate", label: "Date Processed", sortable: "y" },
           { name: "createdAt", label: "Date (Block Timestamp)", sortable: "y" },
           { name: "contractAddress", label: "Contract Address", sortable: "y" },
+          { name: "gasUsed", label: "Gas Used", sortable: "y" },
+          {
+            name: "cumulativeGasUsed",
+            label: "Cumulative Gas Used",
+            sortable: "y",
+          },
+          {
+            name: "effectiveGasPrice (Gwei)",
+            label: "Effective Gas Price (Gwei)",
+            sortable: "y",
+          },
+
           {
             name: "count(successful)",
             label: "Successful Transactions",

@@ -40,6 +40,18 @@ function Row(props: { row: any }) {
         <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
           {row.contractAddress.label}
         </TableCell>
+        {/* gas used */}
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.gasUsed.label}
+        </TableCell>
+        {/* cumulativeGas used */}
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.cumulativeGasUsed.label}
+        </TableCell>
+        {/* effectiveGasPrice*/}
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.effectiveGasPrice.label}
+        </TableCell>
         {/* successfulpayments count */}
         <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
           {row.payments.successfulPayments.count}
@@ -55,7 +67,7 @@ function Row(props: { row: any }) {
       </TableRow>
       {/* this could likely be put in another component */}
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 0, padding: 3, backgroundColor: "#f1eff1" }}>
               {row?.payments.successfulPayments.paymentsArray.length > 0 ? (
