@@ -275,6 +275,24 @@ function App() {
         detailedPaymentData.successfulPayments.filter(
           ({ transaction }: any) => batch.transaction.value === transaction
         );
+      // console.log("successfulFounTRANSACTIONS", foundSuccessfulTransactions);
+      //totals the feeAmount collected from each wallet processed in a batch
+      const sumOfFees = foundSuccessfulTransactions.reduce(
+        (accumulator: number, transaction: any) => {
+          let sum = accumulator + Number(transaction.feeAmount);
+          // console.log("transaction.paymenttoken:", transaction.paymentToken);
+          let formattedSum = divideByTokenDecimalPlaces(
+            Number(sum),
+            //!double check that this is correct, works but wondering which of the transactions in batch it is from, should not matter, just curious why it works
+            transaction.paymentToken,
+            networkURLs,
+            tokenDecimalsReference,
+            network
+          );
+          return formattedSum;
+        },
+        0
+      );
 
       const formattedFoundSuccessfulTransactions =
         foundSuccessfulTransactions.map(
@@ -446,6 +464,7 @@ function App() {
             payments: {
               successfulPayments: {
                 count: foundSuccessfulTransactions.length,
+                totalFeesCollected: sumOfFees,
                 heading: [
                   {
                     name: "accountProcessed",
