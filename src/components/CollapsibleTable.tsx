@@ -40,10 +40,22 @@ function Row(props: { row: any }) {
         <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
           {row.contractAddress.label}
         </TableCell>
+        {/* successfulpayments count */}
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.payments.successfulPayments.count}
+        </TableCell>
+        {/* failed payments count */}
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.payments.failedPayments.count}
+        </TableCell>
+        {/* total fees collected from successful payments */}
+        <TableCell sx={{ letterSpacing: "0.04rem" }} align="right">
+          {row.payments.successfulPayments.totalFeesCollected}
+        </TableCell>
       </TableRow>
       {/* this could likely be put in another component */}
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 0, padding: 3, backgroundColor: "#f1eff1" }}>
               {row?.payments.successfulPayments.paymentsArray.length > 0 ? (
@@ -87,7 +99,7 @@ function Row(props: { row: any }) {
 export function CollapsibleTable({ payments }: any) {
   const batchHeadings = payments?.headings.batchHeadings;
   const batchData = payments?.batchData;
-
+  console.log("BATCH DATA:", batchData);
   //state for column to 'orderBy', and whether to 'order' "asc" or "desc"
 
   return (

@@ -10,13 +10,6 @@ import { CollapsibleTable } from "./components/CollapsibleTable";
 import { DropdownProcessors } from "./components/DropdownProcessors";
 import { DropdownNetworks } from "./components/DropdownNetworks";
 import "./App.css";
-import { ethers } from "ethers";
-// import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-
-// // Using HTTPS
-// const web3 = createAlchemyWeb3(
-//   "https://eth-mainnet.alchemyapi.io/v2/<api-key>"
-// );
 
 //hard-coded processors array
 const processors: string[] = [
@@ -275,23 +268,26 @@ function App() {
         detailedPaymentData.successfulPayments.filter(
           ({ transaction }: any) => batch.transaction.value === transaction
         );
-      // console.log("successfulFounTRANSACTIONS", foundSuccessfulTransactions);
+
       //totals the feeAmount collected from each wallet processed in a batch
+      let paymentToken = "";
       const sumOfFees = foundSuccessfulTransactions.reduce(
         (accumulator: number, transaction: any) => {
           let sum = accumulator + Number(transaction.feeAmount);
-          // console.log("transaction.paymenttoken:", transaction.paymentToken);
-          let formattedSum = divideByTokenDecimalPlaces(
-            Number(sum),
-            //!double check that this is correct, works but wondering which of the transactions in batch it is from, should not matter, just curious why it works
-            transaction.paymentToken,
-            networkURLs,
-            tokenDecimalsReference,
-            network
-          );
-          return formattedSum;
+          paymentToken = transaction.paymentToken;
+          return sum;
         },
         0
+      );
+      console.log(sumOfFees);
+      console.log(paymentToken);
+
+      let formattedSumOfFees = divideByTokenDecimalPlaces(
+        Number(sumOfFees),
+        paymentToken,
+        networkURLs,
+        tokenDecimalsReference,
+        network
       );
 
       const formattedFoundSuccessfulTransactions =
@@ -464,7 +460,7 @@ function App() {
             payments: {
               successfulPayments: {
                 count: foundSuccessfulTransactions.length,
-                totalFeesCollected: sumOfFees,
+                totalFeesCollected: formattedSumOfFees,
                 heading: [
                   {
                     name: "accountProcessed",
@@ -548,6 +544,21 @@ function App() {
           // { name: "processedForDate", label: "Date Processed", sortable: "y" },
           { name: "createdAt", label: "Date (Block Timestamp)", sortable: "y" },
           { name: "contractAddress", label: "Contract Address", sortable: "y" },
+          {
+            name: "count(successful)",
+            label: "Successful Transactions",
+            sortable: "y",
+          },
+          {
+            name: "count(failed)",
+            label: "Failed Transactions",
+            sortable: "y",
+          },
+          {
+            name: "totalFeesCollected",
+            label: "Total Fees Collected",
+            sortable: "y",
+          },
         ],
       },
       batchData: batchArray,
