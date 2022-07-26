@@ -23,10 +23,12 @@ const processors: string[] = [
 const networkURLs: NetworkInfo[] = [
   {
     name: "Polygon",
+    id: "matic",
     url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon",
   },
   {
     name: "Rinkeby",
+    id: "rinkeby",
     url: "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-rinkeby",
   },
 ];
@@ -52,14 +54,30 @@ function App() {
     "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon"
   );
 
-  const fetchAlchemyBatchInfo = async (batchId: string) => {
+  const getNetworkId = (network: string, networkURLs: any) => {
+    //get network name
+    let currentNetwork = networkURLs.find((networkObj: any) => {
+      return networkObj.url === network;
+    });
+    //get network id
+    if (currentNetwork !== undefined) {
+      return currentNetwork.id;
+    }
+  };
+
+  const fetchAlchemyBatchInfo = async (
+    batchId: string,
+    network: string,
+    networkURLs: any
+  ) => {
+    let networkId = getNetworkId(network, networkURLs);
     const { ethers } = require("ethers");
     const apiKey = "YJ34MEc7XE8whdLnDPRKW1I8e14GGeuB";
-    const provider = new ethers.providers.AlchemyProvider("matic", apiKey);
+    const provider = new ethers.providers.AlchemyProvider(networkId, apiKey);
     // Query the blockchain (for a particular hash)
     const receipt = await provider.getTransactionReceipt(batchId);
-    console.log("RECEIPT:", receipt);
-    console.log("RECEIPT:", Number(receipt.gasUsed._hex));
+    // console.log("RECEIPT:", receipt);
+    // console.log("RECEIPT:", Number(receipt.gasUsed._hex));
     let alchemyGasData = {
       gasUsed: Number(receipt.gasUsed._hex),
       cumulativeGasUsed: Number(receipt.cumulativeGasUsed._hex),
@@ -244,7 +262,11 @@ function App() {
         //   alchemyGasData = await fetchAlchemyBatchInfo(batchId);
         // }
 
-        let alchemyGasData = await fetchAlchemyBatchInfo(batchId);
+        let alchemyGasData = await fetchAlchemyBatchInfo(
+          batchId,
+          network,
+          networkURLs
+        );
 
         // console.log(
         //   "alchemygas data: ",

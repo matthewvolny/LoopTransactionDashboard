@@ -24,5 +24,6 @@ export interface Payments {
 
 export type NetworkInfo = {
   name: string;
+  id: string;
   url: string;
 };
