@@ -10,6 +10,13 @@ import { CollapsibleTable } from "./components/CollapsibleTable";
 import { DropdownProcessors } from "./components/DropdownProcessors";
 import { DropdownNetworks } from "./components/DropdownNetworks";
 import "./App.css";
+import { ethers } from "ethers";
+// import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+
+// // Using HTTPS
+// const web3 = createAlchemyWeb3(
+//   "https://eth-mainnet.alchemyapi.io/v2/<api-key>"
+// );
 
 //hard-coded processors array
 const processors: string[] = [
@@ -51,6 +58,22 @@ function App() {
   const [network, setNetwork] = useState<string>(
     "https://api.thegraph.com/subgraphs/name/loopcrypto/loop-polygon"
   );
+
+  // const fetchAlchemyBatchInfo = async (batchId: string) => {
+  //   const { ethers } = require("ethers");
+  //   const apiKey = "YJ34MEc7XE8whdLnDPRKW1I8e14GGeuB";
+  //   const provider = new ethers.providers.AlchemyProvider("matic", apiKey);
+  //   // Query the blockchain (for a particular hash)
+  //   const receipt = await provider.getTransactionReceipt(batchId);
+  //   console.log("RECEIPT:", receipt);
+  //   console.log("RECEIPT:", Number(receipt.gasUsed._hex));
+  //   let alchemyGasData = {
+  //     gasUsed: receipt.gasUsed._hex,
+  //     cumulativeGasUsed: receipt.cumulativeGasUsed._hex,
+  //     effectiveGasPrice: receipt.effectiveGasPrice._hex,
+  //   };
+  //   return alchemyGasData;
+  // };
 
   //1
   useEffect(() => {
@@ -106,10 +129,12 @@ function App() {
       .query({
         query: gql(tokensQuery),
       })
-      .then((data) => {
+      .then(async (data) => {
         let detailedPaymentData = addSubscriptionDataToPayments(data.data);
         //console.log("detailedPaymentData", detailedPaymentData);
-        let paymentBatches = createPaymentBatchesObject(detailedPaymentData);
+        let paymentBatches = await createPaymentBatchesObject(
+          detailedPaymentData
+        );
         //console.log("paymentBatches", paymentBatches);
         // console.log(
         //   "formatted for table",
@@ -185,15 +210,23 @@ function App() {
   };
 
   //create payment batches array (includes batches with successful and failed payments)
-  const createPaymentBatchesObject = (detailedPaymentData: any) => {
+  const createPaymentBatchesObject = async (detailedPaymentData: any) => {
     console.log("detailedpaymentData:", detailedPaymentData);
 
     let batches: any = [];
     let batchCount: Obj = {};
 
-    const addBatchesToArray = (payments: any) => {
-      payments.forEach((payment: any) => {
+    const addBatchesToArray = async (payments: any) => {
+      for (const payment of payments) {
+        // payments.forEach(async (payment: any) => {
         let batchId = payment.transaction;
+        // let alchemyGasData = await fetchAlchemyBatchInfo(batchId);
+        // console.log(
+        //   "alchemygas data: ",
+        //   alchemyGasData.gasUsed,
+        //   alchemyGasData.cumulativeGasUsed,
+        //   alchemyGasData.effectiveGasPrice
+        // );
         if (!batchCount[batchId]) {
           batchCount[batchId] = 1;
           batches.push({
@@ -206,15 +239,30 @@ function App() {
               label: payment.contractAddress,
               value: payment.contractAddress,
             },
+            // gasUsed: {
+            //   label: alchemyGasData.gasUsed,
+            //   value: alchemyGasData.gasUsed,
+            // },
+            // cumulativeGasUsed: {
+            //   label: alchemyGasData.cumulativeGasUsed,
+            //   value: alchemyGasData.cumulativeGasUsed,
+            // },
+            // effectiveGasPrice: {
+            //   label: alchemyGasData.effectiveGasPrice,
+            //   value: alchemyGasData.effectiveGasPrice,
+            // },
           });
         }
-      });
+        // });
+      }
+      // console.log("batches", batches);
     };
 
-    addBatchesToArray(detailedPaymentData.successfulPayments);
-    addBatchesToArray(detailedPaymentData.failedPayments);
+    await addBatchesToArray(detailedPaymentData.successfulPayments);
+    await addBatchesToArray(detailedPaymentData.failedPayments);
 
     console.log("batches", batches);
+
     return batches;
   };
 
@@ -397,6 +445,7 @@ function App() {
             ...batch,
             payments: {
               successfulPayments: {
+                count: foundSuccessfulTransactions.length,
                 heading: [
                   {
                     name: "accountProcessed",
@@ -437,6 +486,7 @@ function App() {
                 paymentsArray: formattedFoundSuccessfulTransactions,
               },
               failedPayments: {
+                count: foundFailedTransactions.length,
                 heading: [
                   {
                     name: "accountProcessed",

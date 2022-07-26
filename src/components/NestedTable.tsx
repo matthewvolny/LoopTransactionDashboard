@@ -13,7 +13,11 @@ export const NestedTable = ({ payments }: any) => {
           {payments?.heading.map((item: any) => {
             return (
               <TableCell
-                sx={{ fontWeight: 600, letterSpacing: "0.04rem" }}
+                sx={{
+                  fontWeight: 600,
+                  letterSpacing: "0.04rem",
+                  color: "white",
+                }}
                 align="right"
                 key={Math.floor(Math.random() * 1000000)}
               >

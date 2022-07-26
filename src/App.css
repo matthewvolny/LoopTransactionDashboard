@@ -42,7 +42,7 @@ td {
 }
 
 th {
-  background-color: #6065ec;
+  background-color: #6b70ec;
 }
 
 /* td {
@@ -82,3 +82,7 @@ tr {
 /* form * {
   font-size: 28px;
 } */
+
+.Mui-selected {
+  color: red;
+}
